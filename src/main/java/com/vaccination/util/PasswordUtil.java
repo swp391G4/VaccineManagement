@@ -1,15 +1,13 @@
 package com.vaccination.util;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 public class PasswordUtil {
     
     public static String hashPassword(String password) {
-        return DigestUtils.sha256Hex(password);
+        return password;
     }
 
-    public static boolean verifyPassword(String password, String hashedPassword) {
-        return hashPassword(password).equals(hashedPassword);
+    public static boolean verifyPassword(String password, String storedPassword) {
+        return password.equals(storedPassword);
     }
 
     public static boolean isValidPassword(String password) {
