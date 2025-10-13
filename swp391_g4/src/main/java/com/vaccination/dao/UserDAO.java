@@ -1,0 +1,196 @@
+package com.vaccination.dao;
+
+import com.vaccination.model.User;
+import com.vaccination.util.DatabaseConnection;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UserDAO {
+    
+    public User findByEmail(String email) {
+        String sql = "SELECT * FROM Users WHERE Email = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public User findById(int userId) {
+        String sql = "SELECT * FROM Users WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean createUser(User user) {
+        String sql = "INSERT INTO Users (Email, PasswordHash, FullName, PhoneNumber, Role, IsActive) " +
+                     "VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            stmt.setString(1, user.getEmail());
+            stmt.setString(2, user.getPasswordHash());
+            stmt.setString(3, user.getFullName());
+            stmt.setString(4, user.getPhoneNumber());
+            stmt.setString(5, user.getRole());
+            stmt.setBoolean(6, user.isActive());
+            
+            int affected = stmt.executeUpdate();
+            
+            if (affected > 0) {
+                ResultSet rs = stmt.getGeneratedKeys();
+                if (rs.next()) {
+                    user.setUserId(rs.getInt(1));
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateUser(User user) {
+        String sql = "UPDATE Users SET FullName = ?, PhoneNumber = ?, UpdatedAt = GETDATE() WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, user.getFullName());
+            stmt.setString(2, user.getPhoneNumber());
+            stmt.setInt(3, user.getUserId());
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updatePassword(int userId, String newPasswordHash) {
+        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = GETDATE() WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, newPasswordHash);
+            stmt.setInt(2, userId);
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateLastLogin(int userId) {
+        String sql = "UPDATE Users SET LastLogin = GETDATE() WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<User> findByRole(String role) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users WHERE Role = ? AND IsActive = 1";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, role);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users ORDER BY CreatedAt DESC";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    public boolean deactivateUser(int userId) {
+        String sql = "UPDATE Users SET IsActive = 0, UpdatedAt = GETDATE() WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private User extractUserFromResultSet(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setUserId(rs.getInt("UserID"));
+        user.setEmail(rs.getString("Email"));
+        user.setPasswordHash(rs.getString("PasswordHash"));
+        user.setFullName(rs.getString("FullName"));
+        user.setPhoneNumber(rs.getString("PhoneNumber"));
+        user.setRole(rs.getString("Role"));
+        user.setActive(rs.getBoolean("IsActive"));
+        
+        Timestamp createdAt = rs.getTimestamp("CreatedAt");
+        if (createdAt != null) user.setCreatedAt(createdAt.toLocalDateTime());
+        
+        Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+        if (updatedAt != null) user.setUpdatedAt(updatedAt.toLocalDateTime());
+        
+        Timestamp lastLogin = rs.getTimestamp("LastLogin");
+        if (lastLogin != null) user.setLastLogin(lastLogin.toLocalDateTime());
+        
+        return user;
+    }
+}
