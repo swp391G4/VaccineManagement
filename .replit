@@ -23,7 +23,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "mvn cargo:run"
+args = "mvn clean package cargo:run"
 waitForPort = 5000
 
 [[ports]]
