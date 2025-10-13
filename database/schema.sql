@@ -199,7 +199,7 @@ CREATE TABLE Notifications (
 -- Insert Default Admin User (password: Admin@123)
 INSERT INTO Users (Email, PasswordHash, FullName, PhoneNumber, Role, IsActive) 
 VALUES ('admin@vaccination.com', 
-        'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f',
+        'Admin@123',
         'System Administrator', 
         '0123456789', 
         'ADMIN', 
