@@ -26,7 +26,7 @@ GO
 CREATE TABLE Users (
     UserID INT IDENTITY(1,1) PRIMARY KEY,
     Email NVARCHAR(100) UNIQUE NOT NULL,
-    PasswordHash NVARCHAR(255) NOT NULL,
+    Password NVARCHAR(255) NOT NULL,
     FullName NVARCHAR(100) NOT NULL,
     PhoneNumber NVARCHAR(20),
     Role NVARCHAR(20) NOT NULL CHECK (Role IN ('ADMIN', 'RECEPTION', 'MEDICAL', 'PARENT')),
@@ -197,7 +197,7 @@ CREATE TABLE Notifications (
 );
 
 -- Insert Default Admin User (password: Admin@123)
-INSERT INTO Users (Email, PasswordHash, FullName, PhoneNumber, Role, IsActive) 
+INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) 
 VALUES ('admin@vaccination.com', 
         'Admin@123',
         'System Administrator', 
