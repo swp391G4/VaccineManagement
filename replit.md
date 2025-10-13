@@ -6,9 +6,12 @@ A comprehensive child vaccination management and scheduling system built with Ja
 ## Technology Stack
 - **Backend**: Java 17 (configured in pom.xml), Jakarta Servlet API 6.0, JSP 3.1
 - **Web Server**: Apache Tomcat 10 (via Cargo Maven plugin)
-- **Database**: MSSQL Server (configured but not connected yet)
+- **Database**: MSSQL Server
+  - Username: dodt
+  - Password: 123456789
 - **Build Tool**: Maven 3.8.6
 - **Frontend**: Bootstrap 5, JSP, JSTL
+- **Security**: Plain text passwords (no hashing per user request)
 
 ## Architecture & Design Patterns
 - **MVC Pattern**: Model-View-Controller architecture
@@ -88,7 +91,7 @@ This project follows the standard Maven structure and can be opened directly in 
 
 ## Default Admin Credentials
 - Email: admin@vaccination.com
-- Password: Admin@123 (SHA-256 hash in database)
+- Password: Admin@123 (plain text, no hashing)
 
 ## Next Steps
 1. Complete appointment booking functionality
@@ -101,15 +104,20 @@ This project follows the standard Maven structure and can be opened directly in 
 8. Generate digital vaccination certificates (PDF/QR)
 
 ## Known Issues
-- MSSQL database connection not configured (using default properties)
-- Project configured for Java 17 in pom.xml but Replit environment uses Java 19
+- None at the moment
 
 ## Development Notes
-- Uses SHA-256 for password hashing
+- **Password Storage**: Plain text (no hashing per user request - for educational purposes only)
 - Session-based authentication
 - Role-based access control implemented via servlets
 - Bootstrap 5 for responsive UI
 - All workflows are managed by Cargo Maven plugin with Tomcat 10
 - Project structure reorganized for NetBeans IDE compatibility
+
+## Security Warning
+⚠️ **This project uses plain text passwords for educational purposes only.**
+- Passwords are stored in database without encryption
+- Not recommended for production use
+- Always use password hashing (bcrypt, Argon2, etc.) in real applications
 
 Last Updated: 2025-10-13
