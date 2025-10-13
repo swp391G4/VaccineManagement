@@ -42,11 +42,14 @@
                     <a href="${pageContext.request.contextPath}/parent/children" class="list-group-item list-group-item-action">
                         <i class="bi bi-people"></i> My Children
                     </a>
-                    <a href="${pageContext.request.contextPath}/parent/appointments" class="list-group-item list-group-item-action">
-                        <i class="bi bi-calendar-check"></i> Appointments
+                    <a href="${pageContext.request.contextPath}/parent/booking/step1" class="list-group-item list-group-item-action">
+                        <i class="bi bi-calendar-plus"></i> Book Appointment
                     </a>
-                    <a href="${pageContext.request.contextPath}/parent/vaccinations" class="list-group-item list-group-item-action">
-                        <i class="bi bi-clipboard-pulse"></i> Vaccination Records
+                    <a href="${pageContext.request.contextPath}/parent/appointments" class="list-group-item list-group-item-action">
+                        <i class="bi bi-calendar-check"></i> My Appointments
+                    </a>
+                    <a href="${pageContext.request.contextPath}/parent/vaccination-history" class="list-group-item list-group-item-action">
+                        <i class="bi bi-clipboard-pulse"></i> Vaccination History
                     </a>
                 </div>
             </div>
@@ -126,9 +129,13 @@
                                                            class="btn btn-sm btn-info">
                                                             <i class="bi bi-eye"></i> View
                                                         </a>
-                                                        <a href="${pageContext.request.contextPath}/parent/appointments/book?childId=${child.childId}" 
+                                                        <a href="${pageContext.request.contextPath}/parent/booking/step1?childId=${child.childId}" 
                                                            class="btn btn-sm btn-primary">
-                                                            <i class="bi bi-calendar-plus"></i> Book Appointment
+                                                            <i class="bi bi-calendar-plus"></i> Book
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/parent/vaccination-history/${child.childId}" 
+                                                           class="btn btn-sm btn-success">
+                                                            <i class="bi bi-file-medical"></i> History
                                                         </a>
                                                     </td>
                                                 </tr>
