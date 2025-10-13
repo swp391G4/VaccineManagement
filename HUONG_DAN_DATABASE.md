@@ -8,27 +8,18 @@ Code hiện tại đã được cập nhật để sử dụng **plain text pass
 
 ## 📋 CÁC BƯỚC THỰC HIỆN
 
-### Bước 1: Xóa database cũ
+### ✅ Chỉ cần 1 bước duy nhất:
+
 Mở **SQL Server Management Studio** hoặc **Azure Data Studio**, chạy file:
 ```
-database/DROP_AND_RECREATE.sql
+📁 database/schema.sql
 ```
 
-Hoặc chạy lệnh SQL sau:
-```sql
-USE master;
-GO
-
-ALTER DATABASE VaccinationDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-DROP DATABASE VaccinationDB;
-GO
-```
-
-### Bước 2: Tạo database mới
-Chạy file:
-```
-database/schema.sql
-```
+**Xong!** File này sẽ tự động:
+1. ✅ Xóa database cũ (nếu có)
+2. ✅ Tạo database mới
+3. ✅ Tạo tất cả tables
+4. ✅ Insert dữ liệu mẫu (admin, vaccines, centers)
 
 Database mới sẽ có:
 - ✅ Cột `Password` (plain text, không hash)

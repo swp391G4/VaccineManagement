@@ -79,6 +79,11 @@ A comprehensive child vaccination management and scheduling system built with Ja
 - ⏳ Admin features
 - ⏳ Reporting and analytics
 
+## Database Setup
+1. Open SQL Server Management Studio or Azure Data Studio
+2. Run the single file: `database/schema.sql`
+3. This will automatically drop old database and create new one with all tables and sample data
+
 ## Running the Application
 1. Start the server: `mvn cargo:run`
 2. Access the application: `http://localhost:5000`
