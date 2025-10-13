@@ -4,8 +4,8 @@
 A comprehensive child vaccination management and scheduling system built with Java Web (JSP/Servlet), OOP principles, and MSSQL database.
 
 ## Technology Stack
-- **Backend**: Java 19, Jakarta Servlet API 6.0, JSP 3.1
-- **Web Server**: Apache Tomcat 7 (via Maven plugin)
+- **Backend**: Java 17 (configured in pom.xml), Jakarta Servlet API 6.0, JSP 3.1
+- **Web Server**: Apache Tomcat 10 (via Cargo Maven plugin)
 - **Database**: MSSQL Server (configured but not connected yet)
 - **Build Tool**: Maven 3.8.6
 - **Frontend**: Bootstrap 5, JSP, JSTL
@@ -77,8 +77,14 @@ A comprehensive child vaccination management and scheduling system built with Ja
 - ⏳ Reporting and analytics
 
 ## Running the Application
-1. Start the server: `mvn tomcat7:run -Dmaven.tomcat.port=5000`
+1. Start the server: `mvn cargo:run`
 2. Access the application: `http://localhost:5000`
+
+## NetBeans Integration
+This project follows the standard Maven structure and can be opened directly in NetBeans IDE:
+1. File → Open Project
+2. Navigate to the project root directory (where pom.xml is located)
+3. NetBeans will automatically recognize it as a Maven project
 
 ## Default Admin Credentials
 - Email: admin@vaccination.com
@@ -95,14 +101,15 @@ A comprehensive child vaccination management and scheduling system built with Ja
 8. Generate digital vaccination certificates (PDF/QR)
 
 ## Known Issues
-- Tomcat 7 shows warnings about module-info.class compatibility with Jakarta/Java 19 (non-fatal)
 - MSSQL database connection not configured (using default properties)
+- Project configured for Java 17 in pom.xml but Replit environment uses Java 19
 
 ## Development Notes
 - Uses SHA-256 for password hashing
 - Session-based authentication
 - Role-based access control implemented via servlets
 - Bootstrap 5 for responsive UI
-- All workflows are managed by Tomcat Maven plugin
+- All workflows are managed by Cargo Maven plugin with Tomcat 10
+- Project structure reorganized for NetBeans IDE compatibility
 
-Last Updated: 2025-10-12
+Last Updated: 2025-10-13
