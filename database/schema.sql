@@ -1,22 +1,28 @@
--- Child Vaccination Management System - MSSQL Database Schema
+-- ============================================
+-- Child Vaccination Management System
+-- MSSQL Database Schema
+-- ============================================
+-- HƯỚNG DẪN: Chạy file này để tạo database hoàn chỉnh
+-- Admin login: admin@vaccination.com / Admin@123
+-- ============================================
 
--- Drop existing tables if they exist
-IF OBJECT_ID('VaccinationRecords', 'U') IS NOT NULL DROP TABLE VaccinationRecords;
-IF OBJECT_ID('Appointments', 'U') IS NOT NULL DROP TABLE Appointments;
-IF OBJECT_ID('VaccineStock', 'U') IS NOT NULL DROP TABLE VaccineStock;
-IF OBJECT_ID('StaffAssignments', 'U') IS NOT NULL DROP TABLE StaffAssignments;
-IF OBJECT_ID('WorkingSchedule', 'U') IS NOT NULL DROP TABLE WorkingSchedule;
-IF OBJECT_ID('Notifications', 'U') IS NOT NULL DROP TABLE Notifications;
-IF OBJECT_ID('Children', 'U') IS NOT NULL DROP TABLE Children;
-IF OBJECT_ID('Vaccines', 'U') IS NOT NULL DROP TABLE Vaccines;
-IF OBJECT_ID('Centers', 'U') IS NOT NULL DROP TABLE Centers;
-IF OBJECT_ID('Users', 'U') IS NOT NULL DROP TABLE Users;
+-- Step 1: Drop existing database if exists (để tạo mới hoàn toàn)
+USE master;
+GO
 
--- Create Database if not exists
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'VaccinationDB')
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'VaccinationDB')
 BEGIN
-    CREATE DATABASE VaccinationDB;
+    ALTER DATABASE VaccinationDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE VaccinationDB;
+    PRINT 'Database cũ đã được xóa';
 END
+GO
+
+-- Step 2: Create new database
+CREATE DATABASE VaccinationDB;
+GO
+
+PRINT 'Database mới đã được tạo';
 GO
 
 USE VaccinationDB;
