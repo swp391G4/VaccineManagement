@@ -18,8 +18,8 @@
 /home/runner/workspace/src/main/java/com/vaccination/model/Appointment.java
 /home/runner/workspace/src/main/java/com/vaccination/util/DatabaseConnection.java
 /home/runner/workspace/src/main/java/com/vaccination/util/PasswordUtil.java
-/home/runner/workspace/src/main/java/com/vaccination/model/Child.java
 /home/runner/workspace/src/main/java/com/vaccination/model/Notification.java
+/home/runner/workspace/src/main/java/com/vaccination/model/Child.java
 /home/runner/workspace/src/main/java/com/vaccination/controller/LoginServlet.java
 /home/runner/workspace/src/main/java/com/vaccination/dao/VaccinationRecordDAO.java
 /home/runner/workspace/src/main/java/com/vaccination/model/Center.java
