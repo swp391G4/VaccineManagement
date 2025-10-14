@@ -38,10 +38,14 @@ public class VaccinationScheduleTemplateDAO {
     
     public List<VaccinationScheduleTemplate> findRecommendedForAge(int ageInMonths) {
         List<VaccinationScheduleTemplate> templates = new ArrayList<>();
-        String sql = "SELECT vst.*, v.* FROM VaccinationScheduleTemplate vst " +
+        String sql = "SELECT vst.TemplateID, vst.VaccineID, vst.StageName, vst.AgeInMonths, vst.DoseNumber, " +
+                    "vst.Description AS TemplateDescription, vst.IsMandatory, vst.DisplayOrder, vst.IsActive AS TemplateIsActive, vst.CreatedAt AS TemplateCreatedAt, " +
+                    "v.VaccineName, v.Manufacturer, v.Description, v.DiseasesPrevented, v.DosageSchedule, " +
+                    "v.RecommendedAge, v.Price, v.IsFree, v.IsActive, v.SideEffects, v.Contraindications, v.CreatedAt " +
+                    "FROM VaccinationScheduleTemplate vst " +
                     "INNER JOIN Vaccines v ON vst.VaccineID = v.VaccineID " +
                     "WHERE vst.AgeInMonths <= ? AND v.IsActive = 1 " +
-                    "ORDER BY vst.AgeInMonths DESC, vst.DisplayOrder";
+                    "ORDER BY vst.StageName, vst.DisplayOrder";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -95,13 +99,26 @@ public class VaccinationScheduleTemplateDAO {
         template.setStageName(rs.getString("StageName"));
         template.setAgeInMonths(rs.getInt("AgeInMonths"));
         template.setDoseNumber(rs.getInt("DoseNumber"));
-        template.setDescription(rs.getString("Description"));
+        
+        try {
+            template.setDescription(rs.getString("TemplateDescription"));
+        } catch (SQLException e) {
+            template.setDescription(rs.getString("Description"));
+        }
+        
         template.setMandatory(rs.getBoolean("IsMandatory"));
         template.setDisplayOrder(rs.getInt("DisplayOrder"));
         
-        Timestamp createdAt = rs.getTimestamp("vst.CreatedAt");
-        if (createdAt != null) {
-            template.setCreatedAt(createdAt.toLocalDateTime());
+        try {
+            Timestamp createdAt = rs.getTimestamp("TemplateCreatedAt");
+            if (createdAt != null) {
+                template.setCreatedAt(createdAt.toLocalDateTime());
+            }
+        } catch (SQLException e) {
+            Timestamp createdAt = rs.getTimestamp("CreatedAt");
+            if (createdAt != null) {
+                template.setCreatedAt(createdAt.toLocalDateTime());
+            }
         }
         
         return template;
@@ -112,15 +129,20 @@ public class VaccinationScheduleTemplateDAO {
         vaccine.setVaccineId(rs.getInt("VaccineID"));
         vaccine.setVaccineName(rs.getString("VaccineName"));
         vaccine.setManufacturer(rs.getString("Manufacturer"));
-        vaccine.setDescription(rs.getString("v.Description"));
+        vaccine.setDescription(rs.getString("Description"));
         vaccine.setDiseasesPrevented(rs.getString("DiseasesPrevented"));
         vaccine.setDosageSchedule(rs.getString("DosageSchedule"));
         vaccine.setRecommendedAge(rs.getString("RecommendedAge"));
         vaccine.setPrice(rs.getBigDecimal("Price"));
         vaccine.setFree(rs.getBoolean("IsFree"));
-        vaccine.setActive(rs.getBoolean("v.IsActive"));
+        vaccine.setActive(rs.getBoolean("IsActive"));
         vaccine.setSideEffects(rs.getString("SideEffects"));
         vaccine.setContraindications(rs.getString("Contraindications"));
+        
+        Timestamp createdAt = rs.getTimestamp("CreatedAt");
+        if (createdAt != null) {
+            vaccine.setCreatedAt(createdAt.toLocalDateTime());
+        }
         
         return vaccine;
     }
