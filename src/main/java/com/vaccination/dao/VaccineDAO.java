@@ -153,6 +153,7 @@ public class VaccineDAO {
         vaccine.setDosageSchedule(rs.getString("DosageSchedule"));
         vaccine.setRecommendedAge(rs.getString("RecommendedAge"));
         vaccine.setPrice(rs.getBigDecimal("Price"));
+        vaccine.setFree(rs.getBoolean("IsFree"));
         vaccine.setActive(rs.getBoolean("IsActive"));
         vaccine.setSideEffects(rs.getString("SideEffects"));
         vaccine.setContraindications(rs.getString("Contraindications"));
