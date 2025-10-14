@@ -129,4 +129,4 @@ This project follows the standard Maven structure and can be opened directly in 
 - Not recommended for production use
 - Always use password hashing (bcrypt, Argon2, etc.) in real applications
 
-Last Updated: 2025-10-13
+Last Updated: 2025-10-14
