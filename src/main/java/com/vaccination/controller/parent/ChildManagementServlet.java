@@ -109,6 +109,17 @@ public class ChildManagementServlet extends HttpServlet {
             }
 
             if (childDAO.createChild(child)) {
+                // Tự động tạo lịch tiêm cho các vaccine MIỄN PHÍ
+                com.vaccination.service.VaccinationService vaccinationService = 
+                    new com.vaccination.service.VaccinationService();
+                int autoCreatedCount = vaccinationService.autoScheduleFreeVaccines(child);
+                
+                if (autoCreatedCount > 0) {
+                    session.setAttribute("successMessage", 
+                        "Đã thêm bé thành công! Hệ thống đã tự động tạo " + autoCreatedCount + 
+                        " lịch tiêm vaccine miễn phí cho bé.");
+                }
+                
                 response.sendRedirect(request.getContextPath() + "/parent/dashboard");
             } else {
                 request.setAttribute("error", "Failed to add child. Please try again.");
