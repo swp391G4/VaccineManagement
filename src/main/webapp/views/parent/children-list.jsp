@@ -114,12 +114,11 @@
                                                     </td>
                                                     <td>${child.dateOfBirth}</td>
                                                     <td>
-                                                        <c:set var="ageMonths" value="${child.getAgeInMonths()}" />
-                                                        <c:set var="years" value="${ageMonths / 12}" />
-                                                        <c:set var="months" value="${ageMonths % 12}" />
+                                                        <c:set var="years" value="${child.ageYears}" />
+                                                        <c:set var="months" value="${child.ageRemainingMonths}" />
                                                         <c:choose>
-                                                            <c:when test="${ageMonths < 12}">
-                                                                ${ageMonths} months
+                                                            <c:when test="${child.ageInMonths < 12}">
+                                                                ${child.ageInMonths} months
                                                             </c:when>
                                                             <c:when test="${months == 0}">
                                                                 ${years} year${years > 1 ? 's' : ''}

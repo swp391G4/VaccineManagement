@@ -142,6 +142,14 @@ public class Child {
         return (int) java.time.temporal.ChronoUnit.MONTHS.between(dateOfBirth, now);
     }
 
+    public int getAgeYears() {
+        return getAgeInMonths() / 12;
+    }
+
+    public int getAgeRemainingMonths() {
+        return getAgeInMonths() % 12;
+    }
+
     @Override
     public String toString() {
         return "Child{" +
