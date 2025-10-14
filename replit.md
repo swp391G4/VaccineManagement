@@ -114,6 +114,7 @@ This project follows the standard Maven structure and can be opened directly in 
 
 ## Recent Bug Fixes
 - ✅ **2025-10-14**: Fixed parent unable to add children - Child model default constructor now sets isActive = true (previously defaulted to false, causing children to not appear in list)
+- ✅ **2025-10-14**: Fixed age display showing double format (25.166666 years) - Added getAgeYears() and getAgeRemainingMonths() methods to Child model for integer display
 
 ## Development Notes
 - **Password Storage**: Plain text (no hashing per user request - for educational purposes only)
