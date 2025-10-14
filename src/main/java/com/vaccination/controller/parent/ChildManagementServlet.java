@@ -98,6 +98,7 @@ public class ChildManagementServlet extends HttpServlet {
             child.setBloodType(bloodType);
             child.setMedicalHistory(medicalHistory);
             child.setAllergies(allergies);
+            child.setActive(true);
 
             if (weightStr != null && !weightStr.trim().isEmpty()) {
                 child.setWeight(new BigDecimal(weightStr));

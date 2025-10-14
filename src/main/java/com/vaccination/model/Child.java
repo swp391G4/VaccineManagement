@@ -20,6 +20,7 @@ public class Child {
     private LocalDateTime updatedAt;
 
     public Child() {
+        this.isActive = true;
     }
 
     public Child(int childId, int parentId, String fullName, LocalDate dateOfBirth, String gender) {
