@@ -26,5 +26,6 @@
 /home/runner/workspace/src/main/java/com/vaccination/controller/LoginServlet.java
 /home/runner/workspace/src/main/java/com/vaccination/dao/VaccinationRecordDAO.java
 /home/runner/workspace/src/main/java/com/vaccination/model/Center.java
+/home/runner/workspace/src/main/java/com/vaccination/service/VaccinationService.java
 /home/runner/workspace/src/main/java/com/vaccination/dao/ChildDAO.java
 /home/runner/workspace/src/main/java/com/vaccination/model/User.java

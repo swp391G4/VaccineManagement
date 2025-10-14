@@ -3,9 +3,11 @@ package com.vaccination.controller.parent;
 import com.vaccination.dao.ChildDAO;
 import com.vaccination.dao.VaccinationScheduleTemplateDAO;
 import com.vaccination.dao.VaccinationRecordDAO;
+import com.vaccination.dao.AppointmentDAO;
 import com.vaccination.model.Child;
 import com.vaccination.model.User;
 import com.vaccination.model.VaccinationScheduleTemplate;
+import com.vaccination.model.Appointment;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,6 +24,7 @@ public class RecommendedVaccinesServlet extends HttpServlet {
     private ChildDAO childDAO = new ChildDAO();
     private VaccinationScheduleTemplateDAO scheduleTemplateDAO = new VaccinationScheduleTemplateDAO();
     private VaccinationRecordDAO vaccinationRecordDAO = new VaccinationRecordDAO();
+    private AppointmentDAO appointmentDAO = new AppointmentDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -68,10 +71,20 @@ public class RecommendedVaccinesServlet extends HttpServlet {
             .map(record -> record.getVaccineId())
             .collect(Collectors.toSet());
         
+        // Lấy danh sách appointments để hiển thị lịch hẹn đã tạo sẵn cho vaccine miễn phí
+        List<Appointment> appointments = appointmentDAO.findByChildId(childId);
+        Map<Integer, Appointment> appointmentByVaccineId = appointments.stream()
+            .collect(Collectors.toMap(
+                Appointment::getVaccineId,
+                apt -> apt,
+                (existing, replacement) -> existing  // Giữ appointment đầu tiên nếu có duplicate
+            ));
+        
         request.setAttribute("child", child);
         request.setAttribute("ageInMonths", ageInMonths);
         request.setAttribute("groupedTemplates", groupedByStage);
         request.setAttribute("vaccinatedVaccineIds", vaccinatedVaccineIds);
+        request.setAttribute("appointmentByVaccineId", appointmentByVaccineId);
         
         request.getRequestDispatcher("/views/parent/recommended-vaccines.jsp").forward(request, response);
     }

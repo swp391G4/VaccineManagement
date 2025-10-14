@@ -13,6 +13,7 @@ com/vaccination/util/DatabaseConnection.class
 com/vaccination/dao/VaccineDAO.class
 com/vaccination/model/Appointment.class
 com/vaccination/model/Center.class
+com/vaccination/service/VaccinationService.class
 com/vaccination/dao/WorkingScheduleDAO.class
 com/vaccination/model/VaccineStock.class
 com/vaccination/controller/parent/ParentDashboardServlet.class
