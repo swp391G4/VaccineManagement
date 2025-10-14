@@ -56,7 +56,8 @@ A comprehensive child vaccination management and scheduling system built with Ja
 ### Main Tables
 - `Users`: User accounts with role-based access
 - `Children`: Child profiles linked to parent users
-- `Vaccines`: Vaccine catalog
+- `Vaccines`: Vaccine catalog (with IsFree flag to distinguish FREE vs PAID vaccines)
+- `VaccinationScheduleTemplate`: Age-based vaccine recommendations with full Vietnamese schedule
 - `Centers`: Vaccination centers
 - `VaccineStock`: Inventory management per center
 - `Appointments`: Vaccination appointments
@@ -75,6 +76,7 @@ A comprehensive child vaccination management and scheduling system built with Ja
 - ✅ Parent dashboard and child management
 - ✅ **Phase 1: Parent Features** (COMPLETED)
   - ✅ Add/View/Manage children
+  - ✅ **Recommended Vaccines**: Age-based vaccine recommendations with FREE/PAID distinction
   - ✅ Appointment booking (3-step flow: select child/vaccine → select center/date/time → confirm)
   - ✅ View and cancel appointments
   - ✅ Vaccination history by child
@@ -112,12 +114,21 @@ This project follows the standard Maven structure and can be opened directly in 
 7. Add payment integration (optional)
 8. Generate digital vaccination certificates (PDF/QR)
 
-## Recent Bug Fixes
-- ✅ **2025-10-14**: Fixed parent unable to add children - Child model default constructor now sets isActive = true (previously defaulted to false, causing children to not appear in list)
-- ✅ **2025-10-14**: Fixed age display showing double format (25.166666 years) - Added getAgeYears() and getAgeRemainingMonths() methods to Child model for integer display
+## Recent Updates & Bug Fixes
+- ✅ **2025-10-14**: **NEW FEATURE - Recommended Vaccines**
+  - Added IsFree flag to Vaccines table to distinguish FREE (government-mandated) vs PAID (service) vaccines
+  - Created VaccinationScheduleTemplate table with complete Vietnamese vaccination schedule
+  - Implemented age-based vaccine recommendation system
+  - Added RecommendedVaccinesServlet to display age-appropriate vaccines grouped by stage
+  - Created recommended-vaccines.jsp with FREE/PAID badges and vaccination status tracking
+  - Fixed DAO column ambiguity issues with explicit aliases in SQL queries
+- ✅ **2025-10-14**: Fixed parent unable to add children - Child model default constructor now sets isActive = true
+- ✅ **2025-10-14**: Fixed age display showing double format - Added getAgeYears() and getAgeRemainingMonths() methods
 
 ## Development Notes
 - **Password Storage**: Plain text (no hashing per user request - for educational purposes only)
+- **Vaccine Classification**: System distinguishes between FREE (IsFree=1) and PAID (IsFree=0) vaccines
+- **Recommendation Logic**: Age-based vaccine suggestions using VaccinationScheduleTemplate
 - Session-based authentication
 - Role-based access control implemented via servlets
 - Bootstrap 5 for responsive UI
