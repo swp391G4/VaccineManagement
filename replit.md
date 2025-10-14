@@ -27,7 +27,7 @@ A comprehensive child vaccination management and scheduling system built with Ja
 │   ├── java/com/vaccination/
 │   │   ├── model/           # Entity classes (User, Child, Vaccine, etc.)
 │   │   ├── dao/             # Data Access Objects
-│   │   ├── service/         # Business logic layer (to be implemented)
+│   │   ├── service/         # Business logic layer (VaccinationService for auto-scheduling)
 │   │   ├── controller/      # Servlets
 │   │   │   ├── parent/      # Parent role controllers
 │   │   │   └── ...          # Other role controllers
@@ -77,7 +77,8 @@ A comprehensive child vaccination management and scheduling system built with Ja
 - ✅ **Phase 1: Parent Features** (COMPLETED)
   - ✅ Add/View/Manage children
   - ✅ **Recommended Vaccines**: Age-based vaccine recommendations with FREE/PAID distinction
-  - ✅ Appointment booking (3-step flow: select child/vaccine → select center/date/time → confirm)
+  - ✅ **Auto-Schedule FREE Vaccines**: System automatically creates appointments for FREE vaccines when adding a child
+  - ✅ Appointment booking (3-step flow for PAID vaccines: select child/vaccine → select center/date/time → confirm)
   - ✅ View and cancel appointments
   - ✅ Vaccination history by child
 - ⏳ Phase 2: Reception staff features (next)
@@ -115,6 +116,12 @@ This project follows the standard Maven structure and can be opened directly in 
 8. Generate digital vaccination certificates (PDF/QR)
 
 ## Recent Updates & Bug Fixes
+- ✅ **2025-10-14**: **NEW FEATURE - Auto-Schedule FREE Vaccines**
+  - Created VaccinationService to automatically create appointments for FREE vaccines
+  - System calculates vaccination date based on child DOB + recommended age from schedule
+  - When parent adds a child, system auto-creates appointments for all FREE vaccines
+  - UI shows "Đã đặt lịch" with date for FREE vaccines (auto-scheduled)
+  - UI shows "Đặt lịch" button only for PAID vaccines (manual booking required)
 - ✅ **2025-10-14**: **NEW FEATURE - Recommended Vaccines**
   - Added IsFree flag to Vaccines table to distinguish FREE (government-mandated) vs PAID (service) vaccines
   - Created VaccinationScheduleTemplate table with complete Vietnamese vaccination schedule
@@ -129,6 +136,10 @@ This project follows the standard Maven structure and can be opened directly in 
 - **Password Storage**: Plain text (no hashing per user request - for educational purposes only)
 - **Vaccine Classification**: System distinguishes between FREE (IsFree=1) and PAID (IsFree=0) vaccines
 - **Recommendation Logic**: Age-based vaccine suggestions using VaccinationScheduleTemplate
+- **Auto-Scheduling Logic**: 
+  - FREE vaccines: Auto-created when adding child, calculated from DOB + ageInMonths
+  - PAID vaccines: Parent must manually book via booking flow
+  - Default center assigned for auto-created appointments
 - Session-based authentication
 - Role-based access control implemented via servlets
 - Bootstrap 5 for responsive UI
