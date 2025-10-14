@@ -113,6 +113,7 @@
                                         <c:forEach items="${entry.value}" var="template" varStatus="status">
                                             <c:set var="vaccine" value="${template.vaccine}" />
                                             <c:set var="isVaccinated" value="${vaccinatedVaccineIds.contains(vaccine.vaccineId)}" />
+                                            <c:set var="appointment" value="${appointmentByVaccineId[vaccine.vaccineId]}" />
                                             <tr>
                                                 <td>${status.count}</td>
                                                 <td>
@@ -144,9 +145,16 @@
                                                                 <i class="bi bi-check-lg"></i> Đã tiêm
                                                             </span>
                                                         </c:when>
+                                                        <c:when test="${not empty appointment}">
+                                                            <span class="badge bg-info text-dark">
+                                                                <i class="bi bi-calendar-event"></i> Đã đặt lịch
+                                                            </span>
+                                                            <br>
+                                                            <small class="text-muted">${appointment.appointmentDate}</small>
+                                                        </c:when>
                                                         <c:otherwise>
                                                             <span class="badge bg-secondary">
-                                                                <i class="bi bi-clock"></i> Chưa tiêm
+                                                                <i class="bi bi-clock"></i> Chưa có lịch
                                                             </span>
                                                         </c:otherwise>
                                                     </c:choose>
@@ -155,10 +163,27 @@
                                                     <c:choose>
                                                         <c:when test="${isVaccinated}">
                                                             <button class="btn btn-sm btn-outline-secondary" disabled>
-                                                                <i class="bi bi-check"></i> Completed
+                                                                <i class="bi bi-check"></i> Hoàn thành
                                                             </button>
                                                         </c:when>
+                                                        <c:when test="${vaccine.free}">
+                                                            <%-- Vaccine MIỄN PHÍ: Đã tự động tạo lịch hoặc xem lịch hẹn --%>
+                                                            <c:choose>
+                                                                <c:when test="${not empty appointment}">
+                                                                    <a href="${pageContext.request.contextPath}/parent/appointments" 
+                                                                       class="btn btn-sm btn-outline-info">
+                                                                        <i class="bi bi-calendar-check"></i> Xem lịch hẹn
+                                                                    </a>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="text-muted">
+                                                                        <i class="bi bi-info-circle"></i> Tự động tạo lịch
+                                                                    </span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
                                                         <c:otherwise>
+                                                            <%-- Vaccine TRẢ PHÍ: Cần đặt lịch thủ công --%>
                                                             <a href="${pageContext.request.contextPath}/parent/booking/step1?childId=${child.childId}&vaccineId=${vaccine.vaccineId}" 
                                                                class="btn btn-sm btn-primary">
                                                                 <i class="bi bi-calendar-plus"></i> Đặt lịch
