@@ -73,10 +73,14 @@ A comprehensive child vaccination management and scheduling system built with Ja
 - ✅ Basic authentication (login/register/logout)
 - ✅ Guest pages (home, login, register)
 - ✅ Parent dashboard and child management
-- ⏳ Appointment booking system (in progress)
-- ⏳ Reception staff features
-- ⏳ Medical staff features
-- ⏳ Admin features
+- ✅ **Phase 1: Parent Features** (COMPLETED)
+  - ✅ Add/View/Manage children
+  - ✅ Appointment booking (3-step flow: select child/vaccine → select center/date/time → confirm)
+  - ✅ View and cancel appointments
+  - ✅ Vaccination history by child
+- ⏳ Phase 2: Reception staff features (next)
+- ⏳ Phase 3: Medical staff features
+- ⏳ Phase 4: Admin features
 - ⏳ Reporting and analytics
 
 ## Database Setup
@@ -108,8 +112,8 @@ This project follows the standard Maven structure and can be opened directly in 
 7. Add payment integration (optional)
 8. Generate digital vaccination certificates (PDF/QR)
 
-## Known Issues
-- None at the moment
+## Recent Bug Fixes
+- ✅ **2025-10-14**: Fixed parent unable to add children - Child model default constructor now sets isActive = true (previously defaulted to false, causing children to not appear in list)
 
 ## Development Notes
 - **Password Storage**: Plain text (no hashing per user request - for educational purposes only)
