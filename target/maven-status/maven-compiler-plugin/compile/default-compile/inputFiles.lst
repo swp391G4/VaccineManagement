@@ -1,4 +1,5 @@
 /home/runner/workspace/src/main/java/com/vaccination/dao/WorkingScheduleDAO.java
+/home/runner/workspace/src/main/java/com/vaccination/controller/parent/RecommendedVaccinesServlet.java
 /home/runner/workspace/src/main/java/com/vaccination/dao/AppointmentDAO.java
 /home/runner/workspace/src/main/java/com/vaccination/controller/parent/AppointmentManagementServlet.java
 /home/runner/workspace/src/main/java/com/vaccination/dao/UserDAO.java
@@ -20,6 +21,8 @@
 /home/runner/workspace/src/main/java/com/vaccination/util/PasswordUtil.java
 /home/runner/workspace/src/main/java/com/vaccination/model/Notification.java
 /home/runner/workspace/src/main/java/com/vaccination/model/Child.java
+/home/runner/workspace/src/main/java/com/vaccination/model/VaccinationScheduleTemplate.java
+/home/runner/workspace/src/main/java/com/vaccination/dao/VaccinationScheduleTemplateDAO.java
 /home/runner/workspace/src/main/java/com/vaccination/controller/LoginServlet.java
 /home/runner/workspace/src/main/java/com/vaccination/dao/VaccinationRecordDAO.java
 /home/runner/workspace/src/main/java/com/vaccination/model/Center.java

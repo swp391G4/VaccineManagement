@@ -1,7 +1,9 @@
 com/vaccination/dao/UserDAO.class
 com/vaccination/controller/RegisterServlet.class
 com/vaccination/util/PasswordUtil.class
+com/vaccination/controller/parent/RecommendedVaccinesServlet.class
 com/vaccination/model/Child.class
+com/vaccination/dao/VaccinationScheduleTemplateDAO.class
 com/vaccination/controller/parent/VaccinationHistoryServlet.class
 com/vaccination/dao/VaccinationRecordDAO.class
 com/vaccination/model/Notification.class
@@ -21,6 +23,7 @@ com/vaccination/controller/parent/AppointmentBookingServlet$1.class
 com/vaccination/controller/parent/AppointmentBookingServlet.class
 com/vaccination/controller/LoginServlet.class
 com/vaccination/controller/parent/AppointmentManagementServlet.class
+com/vaccination/model/VaccinationScheduleTemplate.class
 com/vaccination/model/WorkingSchedule.class
 com/vaccination/model/VaccinationRecord.class
 com/vaccination/model/Vaccine.class

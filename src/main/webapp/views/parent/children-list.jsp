@@ -161,6 +161,10 @@
                                                                class="btn btn-sm btn-outline-info" title="View Details">
                                                                 <i class="bi bi-eye"></i>
                                                             </a>
+                                                            <a href="${pageContext.request.contextPath}/parent/recommended-vaccines?childId=${child.childId}" 
+                                                               class="btn btn-sm btn-outline-warning" title="Recommended Vaccines">
+                                                                <i class="bi bi-clipboard2-pulse"></i>
+                                                            </a>
                                                             <a href="${pageContext.request.contextPath}/parent/booking/step1?childId=${child.childId}" 
                                                                class="btn btn-sm btn-outline-primary" title="Book Appointment">
                                                                 <i class="bi bi-calendar-plus"></i>

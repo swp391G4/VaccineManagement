@@ -176,6 +176,10 @@
                             <a href="${pageContext.request.contextPath}/parent/children" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Back to List
                             </a>
+                            <a href="${pageContext.request.contextPath}/parent/recommended-vaccines?childId=${child.childId}" 
+                               class="btn btn-info">
+                                <i class="bi bi-clipboard2-pulse"></i> Recommended Vaccines
+                            </a>
                             <a href="${pageContext.request.contextPath}/parent/vaccination-history/${child.childId}" 
                                class="btn btn-success">
                                 <i class="bi bi-clipboard-pulse"></i> View Vaccination History
