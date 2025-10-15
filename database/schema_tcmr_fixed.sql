@@ -265,16 +265,41 @@ INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented,
 
 -- VACCINE TRA PHI (IsFree = 0) - DICH VU
 INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, DosageSchedule, RecommendedAge, Price, IsFree, IsActive) VALUES
-('Rota (lieu 1)', 'GSK', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 1 o 2 thang tuoi', '2 thang', 650000, 0, 1),
-('Rota (lieu 2)', 'GSK', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 2 o 3 thang tuoi', '3 thang', 650000, 0, 1),
-('Phe cau (mui 1)', 'Pfizer', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 1 o 2 thang tuoi', '2 thang', 1200000, 0, 1),
-('Phe cau (mui 2)', 'Pfizer', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 2 o 4 thang tuoi', '4 thang', 1200000, 0, 1),
-('Phe cau (mui 3)', 'Pfizer', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 3 o 6 thang tuoi', '6 thang', 1200000, 0, 1),
-('Phe cau (mui nhac lai)', 'Pfizer', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem nhac lai o 12-15 thang tuoi', '12 thang', 1200000, 0, 1),
-('Thuy dau (mui 1)', 'GSK', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 450000, 0, 1),
-('Thuy dau (mui 2)', 'GSK', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 2 o 18-24 thang tuoi', '18 thang', 450000, 0, 1),
-('Cum (hang nam)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem hang nam tu 6 thang tuoi', '6 thang', 350000, 0, 1),
-('6 trong 1', 'GSK/Sanofi', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B, bai liet', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B, Bai liet', 'Thay the 5 trong 1 (tu nguyen)', '2 thang', 850000, 0, 1);
+-- 2 thang
+('Rota (lieu 1)', 'GSK/Rotarix', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 1 o 2 thang tuoi', '2 thang', 700000, 0, 1),
+('Phe cau (mui 1)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 1 o 2 thang tuoi', '2 thang', 1200000, 0, 1),
+-- 3 thang
+('Rota (lieu 2)', 'GSK/Rotarix', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 2 o 3 thang tuoi', '3 thang', 700000, 0, 1),
+('Phe cau (mui 2)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 2 o 3 thang tuoi', '3 thang', 1200000, 0, 1),
+-- 4 thang (neu uong 3 lieu Rota)
+('Rota (lieu 3)', 'Merck/RotaTeq', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 3 o 4 thang tuoi (neu dung loai 3 lieu)', '4 thang', 750000, 0, 1),
+-- 5 thang
+('Phe cau (mui 3)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 3 o 5 thang tuoi', '5 thang', 1200000, 0, 1),
+-- 6 thang
+('Cum mua (mui 1)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem mui 1 o 6 thang tuoi', '6 thang', 350000, 0, 1),
+-- 7 thang
+('Cum mua (mui 2)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem mui 2 o 7 thang tuoi (giu mien dich 1 nam)', '7 thang', 350000, 0, 1),
+-- 12 thang
+('MMRV (mui 1)', 'GSK/Priorix-Tetra', 'Vaccine phong soi, quai bi, rubella, thuy dau', 'Soi, Quai bi, Rubella, Thuy dau', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 1200000, 0, 1),
+('Viem mang nao mo cau (mui 1)', 'GSK/Bexsero', 'Vaccine phong viem mang nao do mo cau', 'Viem mang nao mo cau (BC hoac ACYW)', 'Tiem sau 9-12 thang tuoi', '12 thang', 1000000, 0, 1),
+('Viem gan A (mui 1)', 'GSK/Havrix', 'Vaccine phong viem gan A', 'Viem gan A', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 700000, 0, 1),
+('Thuy dau (mui 1)', 'GSK/Varilrix', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 450000, 0, 1),
+-- 15 thang
+('Phe cau (mui nhac lai)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 4 nhac lai o 15 thang tuoi', '15 thang', 1200000, 0, 1),
+-- 18 thang
+('MMRV (mui 2)', 'GSK/Priorix-Tetra', 'Vaccine phong soi, quai bi, rubella, thuy dau', 'Soi, Quai bi, Rubella, Thuy dau', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 1200000, 0, 1),
+('Thuy dau (mui 2)', 'GSK/Varilrix', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 450000, 0, 1),
+-- 24 thang (2 tuoi)
+('Viem gan A (mui 2)', 'GSK/Havrix', 'Vaccine phong viem gan A', 'Viem gan A', 'Tiem mui 2 o 24 thang tuoi (2 tuoi)', '24 thang', 700000, 0, 1),
+('Thuong han', 'Sanofi/Typhim Vi', 'Vaccine phong benh thuong han', 'Thuong han', 'Tiem o 24 thang tuoi (2 tuoi)', '24 thang', 600000, 0, 1),
+-- 3-6 tuoi (36-72 thang)
+('Cum mua (nhac hang nam)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem nhac moi nam tu 3-6 tuoi', '36 thang', 350000, 0, 1),
+('Viem mang nao mo cau (nhac)', 'GSK/Bexsero', 'Vaccine phong viem mang nao do mo cau', 'Viem mang nao mo cau', 'Tiem nhac lai (tuy loai vaccine)', '48 thang', 1000000, 0, 1),
+-- 9-14 tuoi (108-168 thang) - be gai
+('HPV (mui 1)', 'MSD/Gardasil 9', 'Vaccine phong ung thu co tu cung', 'HPV (9 chung)', 'Tiem mui 1 cho be gai 9-14 tuoi', '108 thang', 2000000, 0, 1),
+('HPV (mui 2)', 'MSD/Gardasil 9', 'Vaccine phong ung thu co tu cung', 'HPV (9 chung)', 'Tiem mui 2 cho be gai 9-14 tuoi (cach mui 1 khoang 6 thang)', '114 thang', 2000000, 0, 1),
+-- Vaccine thay the (tu nguyen)
+('6 trong 1', 'GSK/Infanrix Hexa', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B, bai liet', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B, Bai liet', 'Thay the 5 trong 1 (tu nguyen)', '2 thang', 850000, 0, 1);
 
 -- ============================================
 -- VACCINATION SCHEDULE TEMPLATE - LICH TCMR
