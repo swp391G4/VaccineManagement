@@ -39,7 +39,7 @@ public class VaccinationScheduleTemplateDAO {
     public List<VaccinationScheduleTemplate> findRecommendedForAge(double ageInMonths) {
         List<VaccinationScheduleTemplate> templates = new ArrayList<>();
         String sql = "SELECT vst.TemplateID, vst.VaccineID, vst.StageName, vst.AgeInMonths, vst.DoseNumber, " +
-                    "vst.Description AS TemplateDescription, vst.IsMandatory, vst.DisplayOrder, vst.IsActive AS TemplateIsActive, vst.CreatedAt AS TemplateCreatedAt, " +
+                    "vst.Description AS TemplateDescription, vst.IsMandatory, vst.DisplayOrder, vst.CreatedAt AS TemplateCreatedAt, " +
                     "v.VaccineName, v.Manufacturer, v.Description, v.DiseasesPrevented, v.DosageSchedule, " +
                     "v.RecommendedAge, v.Price, v.IsFree, v.IsActive, v.SideEffects, v.Contraindications, v.CreatedAt " +
                     "FROM VaccinationScheduleTemplate vst " +
