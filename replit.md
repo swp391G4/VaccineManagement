@@ -105,6 +105,26 @@ This project follows the standard Maven structure and can be opened directly in 
 - Email: admin@vaccination.com
 - Password: Admin@123 (plain text, no hashing)
 
+## Sample Test Accounts
+**Password for all test accounts: 123456**
+
+### Parent Accounts (5)
+- parent1@test.com - Nguyen Van A
+- parent2@test.com - Tran Thi B
+- parent3@test.com - Le Hoang C
+- parent4@test.com - Pham Minh D
+- parent5@test.com - Vo Thi E
+
+### Reception Staff (3)
+- reception1@test.com - Le Van F (Center 1)
+- reception2@test.com - Nguyen Thi G (Center 2)
+- reception3@test.com - Tran Van H (Center 3)
+
+### Medical Staff (3)
+- doctor1@test.com - Bac si Pham Thi I (Center 1)
+- doctor2@test.com - Bac si Nguyen Van K (Center 2)
+- doctor3@test.com - Bac si Tran Thi L (Center 3)
+
 ## Next Steps
 1. Complete appointment booking functionality
 2. Implement reception staff appointment management
