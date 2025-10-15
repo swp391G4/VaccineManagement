@@ -32,11 +32,11 @@ public class VaccinationService {
             return 0;
         }
         
-        // Lấy tất cả vaccine miễn phí từ schedule template
-        List<VaccinationScheduleTemplate> freeVaccineTemplates = 
+        // Lấy tất cả vaccine ĐÚNG tuổi hiện tại (exact match)
+        List<VaccinationScheduleTemplate> currentAgeTemplates = 
             scheduleTemplateDAO.findMandatoryByAge(child.getAgeInMonths());
         
-        if (freeVaccineTemplates.isEmpty()) {
+        if (currentAgeTemplates.isEmpty()) {
             return 0;
         }
         
@@ -49,8 +49,9 @@ public class VaccinationService {
         
         int createdCount = 0;
         LocalDate childDOB = child.getDateOfBirth();
+        int timeOffset = 0;
         
-        for (VaccinationScheduleTemplate template : freeVaccineTemplates) {
+        for (VaccinationScheduleTemplate template : currentAgeTemplates) {
             // Chỉ tạo appointment cho vaccine MIỄN PHÍ (IsFree = true)
             if (template.getVaccine() != null && template.getVaccine().isFree()) {
                 
@@ -68,8 +69,8 @@ public class VaccinationService {
                         vaccinationDate = LocalDate.now().plusDays(1);
                     }
                     
-                    // Tạo appointment tự động với thời gian mặc định 9:00 AM
-                    java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0);
+                    // Tạo appointment với thời gian staggered (mỗi vaccine cách nhau 30 phút)
+                    java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0).plusMinutes(timeOffset * 30);
                     
                     Appointment appointment = new Appointment();
                     appointment.setChildId(child.getChildId());
@@ -83,6 +84,7 @@ public class VaccinationService {
                     
                     if (appointmentDAO.createAppointment(appointment)) {
                         createdCount++;
+                        timeOffset++;
                     }
                 }
             }
