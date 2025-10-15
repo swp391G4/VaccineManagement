@@ -103,17 +103,36 @@ public class VaccinationService {
                 .collect(java.util.stream.Collectors.toSet());
             
             for (VaccinationScheduleTemplate template : templatesOnDate) {
-                // Tìm slot trống đầu tiên, bắt đầu từ 9h00
+                // Tìm slot trống đầu tiên trong giờ làm việc (9h-17h)
+                // Nếu không tìm được, chuyển sang ngày tiếp theo
                 java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0);
-                while (occupiedTimes.contains(appointmentTime)) {
+                java.time.LocalTime endOfDay = java.time.LocalTime.of(17, 0);
+                
+                while (occupiedTimes.contains(appointmentTime) && appointmentTime.isBefore(endOfDay)) {
                     appointmentTime = appointmentTime.plusMinutes(30);
+                }
+                
+                // Nếu vượt quá giờ làm việc, chuyển sang ngày tiếp theo
+                LocalDate finalDate = date;
+                if (!appointmentTime.isBefore(endOfDay)) {
+                    finalDate = date.plusDays(1);
+                    appointmentTime = java.time.LocalTime.of(9, 0);
+                    // Re-check occupied times cho ngày mới
+                    List<Appointment> nextDayAppointments = appointmentDAO.findByCenterAndDate(defaultCenter.getCenterId(), finalDate);
+                    occupiedTimes = nextDayAppointments.stream()
+                        .map(Appointment::getAppointmentTime)
+                        .collect(java.util.stream.Collectors.toSet());
+                    
+                    while (occupiedTimes.contains(appointmentTime) && appointmentTime.isBefore(endOfDay)) {
+                        appointmentTime = appointmentTime.plusMinutes(30);
+                    }
                 }
                 
                 Appointment appointment = new Appointment();
                 appointment.setChildId(child.getChildId());
                 appointment.setVaccineId(template.getVaccineId());
                 appointment.setCenterId(defaultCenter.getCenterId());
-                appointment.setAppointmentDate(date);
+                appointment.setAppointmentDate(finalDate);
                 appointment.setAppointmentTime(appointmentTime);
                 appointment.setStatus("PENDING");
                 appointment.setNotes("Tu dong tao lich tiem TCMR: " + 
