@@ -116,6 +116,13 @@ This project follows the standard Maven structure and can be opened directly in 
 8. Generate digital vaccination certificates (PDF/QR)
 
 ## Recent Updates & Bug Fixes
+- ✅ **2025-10-15**: **MAJOR UPDATE - Lich TCMR Chinh Xac**
+  - ⚠️ **DATABASE CAN UPDATE:** Chay file `database/schema_tcmr_fixed.sql` de cap nhat lich TCMR chinh xac
+  - Fixed vaccination schedule theo dung Chuong trinh TCMR Bo Y te Viet Nam
+  - Support DECIMAL age (0.5 thang = 2 tuan, 12.5 thang = 12 thang + 1-2 tuan)
+  - Auto-schedule tao TAT CA appointments theo lich (khong chi tuoi hien tai)
+  - Staggered times: vaccines cung ngay cach nhau 30 phut
+  - Xem chi tiet: `database/HUONG_DAN_UPDATE_DATABASE.md`
 - ✅ **2025-10-14**: **NEW FEATURE - Auto-Schedule FREE Vaccines**
   - Created VaccinationService to automatically create appointments for FREE vaccines
   - System calculates vaccination date based on child DOB + recommended age from schedule
