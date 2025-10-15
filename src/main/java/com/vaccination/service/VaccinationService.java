@@ -20,7 +20,7 @@ public class VaccinationService {
     
     /**
      * Tự động tạo appointments cho TẤT CẢ vaccine MIỄN PHÍ theo lịch TCMR
-     * Tạo TẤT CẢ appointments theo lịch tiêm (không phụ thuộc tuổi hiện tại)
+     * CHỈ TẠO NGÀY TIÊM - Phụ huynh sẽ tự chọn GIỜ + TRUNG TÂM sau
      * Được gọi khi: Thêm bé mới vào hệ thống
      * 
      * @param child Child object với thông tin ngày sinh
@@ -48,23 +48,11 @@ public class VaccinationService {
             return 0;
         }
         
-        // Lấy center mặc định (center đầu tiên active) để gán appointment
-        Center defaultCenter = getDefaultCenter();
-        if (defaultCenter == null) {
-            System.err.println("No active center found to create appointments");
-            return 0;
-        }
-        
         int createdCount = 0;
         LocalDate childDOB = child.getDateOfBirth();
         
         // Đảm bảo appointments cách ít nhất 2 ngày từ ngày hiện tại
-        // (Không tiêm ngay trong ngày thêm trẻ, cần thời gian chuẩn bị)
         LocalDate earliestAllowedDate = LocalDate.now().plusDays(2);
-        
-        // Group templates by date để xử lý staggered times cho vaccines cùng ngày
-        java.util.Map<LocalDate, java.util.List<VaccinationScheduleTemplate>> templatesByDate = 
-            new java.util.LinkedHashMap<>();
         
         for (VaccinationScheduleTemplate template : freeTemplates) {
             // Kiểm tra xem đã có appointment cho vaccine này chưa
@@ -84,74 +72,15 @@ public class VaccinationService {
                     vaccinationDate = earliestAllowedDate;
                 }
                 
-                // Group by date
-                templatesByDate.computeIfAbsent(vaccinationDate, k -> new java.util.ArrayList<>())
-                    .add(template);
-            }
-        }
-        
-        // Tạo appointments với staggered times cho vaccines cùng ngày
-        // ĐẢM BẢO không trùng giờ với appointments của trẻ khác
-        for (java.util.Map.Entry<LocalDate, java.util.List<VaccinationScheduleTemplate>> entry : templatesByDate.entrySet()) {
-            LocalDate date = entry.getKey();
-            java.util.List<VaccinationScheduleTemplate> templatesOnDate = entry.getValue();
-            
-            // Lấy danh sách appointments đã tồn tại trong ngày này tại center
-            List<Appointment> existingAppointments = appointmentDAO.findByCenterAndDate(defaultCenter.getCenterId(), date);
-            java.util.Set<java.time.LocalTime> occupiedTimes = existingAppointments.stream()
-                .map(Appointment::getAppointmentTime)
-                .collect(java.util.stream.Collectors.toSet());
-            
-            for (VaccinationScheduleTemplate template : templatesOnDate) {
-                // Tìm slot trống - nếu ngày đầy, advance sang ngày tiếp theo
-                // Loop tối đa 30 ngày để tránh infinite loop
-                LocalDate finalDate = date;
-                java.time.LocalTime appointmentTime = null;
-                java.time.LocalTime startTime = java.time.LocalTime.of(9, 0);
-                java.time.LocalTime endTime = java.time.LocalTime.of(17, 0);
-                
-                int maxDaysToCheck = 30;
-                for (int dayOffset = 0; dayOffset < maxDaysToCheck; dayOffset++) {
-                    LocalDate checkDate = date.plusDays(dayOffset);
-                    
-                    // Lấy occupied times cho ngày này
-                    List<Appointment> dayAppointments = appointmentDAO.findByCenterAndDate(defaultCenter.getCenterId(), checkDate);
-                    java.util.Set<java.time.LocalTime> dayOccupiedTimes = dayAppointments.stream()
-                        .map(Appointment::getAppointmentTime)
-                        .collect(java.util.stream.Collectors.toSet());
-                    
-                    // Tìm slot trống trong ngày này
-                    java.time.LocalTime tryTime = startTime;
-                    while (tryTime.isBefore(endTime)) {
-                        if (!dayOccupiedTimes.contains(tryTime)) {
-                            // Tìm được slot trống!
-                            appointmentTime = tryTime;
-                            finalDate = checkDate;
-                            break;
-                        }
-                        tryTime = tryTime.plusMinutes(30);
-                    }
-                    
-                    // Nếu đã tìm được slot, thoát loop
-                    if (appointmentTime != null) {
-                        break;
-                    }
-                }
-                
-                // Nếu vẫn không tìm được slot sau 30 ngày, dùng ngày cuối + 9h
-                if (appointmentTime == null) {
-                    finalDate = date.plusDays(maxDaysToCheck);
-                    appointmentTime = startTime;
-                }
-                
+                // TẠO APPOINTMENT CHỈ VỚI NGÀY - Phụ huynh sẽ tự chọn GIỜ + TRUNG TÂM sau
                 Appointment appointment = new Appointment();
                 appointment.setChildId(child.getChildId());
                 appointment.setVaccineId(template.getVaccineId());
-                appointment.setCenterId(defaultCenter.getCenterId());
-                appointment.setAppointmentDate(finalDate);
-                appointment.setAppointmentTime(appointmentTime);
+                appointment.setCenterId(null);  // Phụ huynh sẽ chọn center
+                appointment.setAppointmentDate(vaccinationDate);
+                appointment.setAppointmentTime(null);  // Phụ huynh sẽ chọn giờ
                 appointment.setStatus("PENDING");
-                appointment.setNotes("Tu dong tao lich tiem TCMR: " + 
+                appointment.setNotes("Vaccine mien phi - Vui long chon gio va trung tam: " + 
                                    template.getVaccine().getVaccineName());
                 
                 if (appointmentDAO.createAppointment(appointment)) {
@@ -161,15 +90,6 @@ public class VaccinationService {
         }
         
         return createdCount;
-    }
-    
-    /**
-     * Lấy center mặc định để tạo appointment tự động
-     * Ưu tiên: Center active đầu tiên trong danh sách
-     */
-    private Center getDefaultCenter() {
-        List<Center> centers = centerDAO.getAllCenters();
-        return centers.isEmpty() ? null : centers.get(0);
     }
     
     /**

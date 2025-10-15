@@ -94,9 +94,23 @@ public class AppointmentDAO {
             
             stmt.setInt(1, appointment.getChildId());
             stmt.setInt(2, appointment.getVaccineId());
-            stmt.setInt(3, appointment.getCenterId());
+            
+            // CenterID can be NULL for FREE vaccines (parent selects later)
+            if (appointment.getCenterId() != null) {
+                stmt.setInt(3, appointment.getCenterId());
+            } else {
+                stmt.setNull(3, java.sql.Types.INTEGER);
+            }
+            
             stmt.setDate(4, Date.valueOf(appointment.getAppointmentDate()));
-            stmt.setTime(5, Time.valueOf(appointment.getAppointmentTime()));
+            
+            // AppointmentTime can be NULL for FREE vaccines (parent selects later)
+            if (appointment.getAppointmentTime() != null) {
+                stmt.setTime(5, Time.valueOf(appointment.getAppointmentTime()));
+            } else {
+                stmt.setNull(5, java.sql.Types.TIME);
+            }
+            
             stmt.setString(6, appointment.getStatus());
             stmt.setString(7, appointment.getPaymentStatus());
             stmt.setBigDecimal(8, appointment.getPaymentAmount());
@@ -190,7 +204,12 @@ public class AppointmentDAO {
         appointment.setAppointmentId(rs.getInt("AppointmentID"));
         appointment.setChildId(rs.getInt("ChildID"));
         appointment.setVaccineId(rs.getInt("VaccineID"));
-        appointment.setCenterId(rs.getInt("CenterID"));
+        
+        // CenterID can be NULL for FREE vaccines (parent selects later)
+        int centerId = rs.getInt("CenterID");
+        if (!rs.wasNull()) {
+            appointment.setCenterId(centerId);
+        }
         
         Date appointmentDate = rs.getDate("AppointmentDate");
         if (appointmentDate != null) appointment.setAppointmentDate(appointmentDate.toLocalDate());
