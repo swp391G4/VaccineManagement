@@ -103,29 +103,45 @@ public class VaccinationService {
                 .collect(java.util.stream.Collectors.toSet());
             
             for (VaccinationScheduleTemplate template : templatesOnDate) {
-                // Tìm slot trống đầu tiên trong giờ làm việc (9h-17h)
-                // Nếu không tìm được, chuyển sang ngày tiếp theo
-                java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0);
-                java.time.LocalTime endOfDay = java.time.LocalTime.of(17, 0);
-                
-                while (occupiedTimes.contains(appointmentTime) && appointmentTime.isBefore(endOfDay)) {
-                    appointmentTime = appointmentTime.plusMinutes(30);
-                }
-                
-                // Nếu vượt quá giờ làm việc, chuyển sang ngày tiếp theo
+                // Tìm slot trống - nếu ngày đầy, advance sang ngày tiếp theo
+                // Loop tối đa 30 ngày để tránh infinite loop
                 LocalDate finalDate = date;
-                if (!appointmentTime.isBefore(endOfDay)) {
-                    finalDate = date.plusDays(1);
-                    appointmentTime = java.time.LocalTime.of(9, 0);
-                    // Re-check occupied times cho ngày mới
-                    List<Appointment> nextDayAppointments = appointmentDAO.findByCenterAndDate(defaultCenter.getCenterId(), finalDate);
-                    occupiedTimes = nextDayAppointments.stream()
+                java.time.LocalTime appointmentTime = null;
+                java.time.LocalTime startTime = java.time.LocalTime.of(9, 0);
+                java.time.LocalTime endTime = java.time.LocalTime.of(17, 0);
+                
+                int maxDaysToCheck = 30;
+                for (int dayOffset = 0; dayOffset < maxDaysToCheck; dayOffset++) {
+                    LocalDate checkDate = date.plusDays(dayOffset);
+                    
+                    // Lấy occupied times cho ngày này
+                    List<Appointment> dayAppointments = appointmentDAO.findByCenterAndDate(defaultCenter.getCenterId(), checkDate);
+                    java.util.Set<java.time.LocalTime> dayOccupiedTimes = dayAppointments.stream()
                         .map(Appointment::getAppointmentTime)
                         .collect(java.util.stream.Collectors.toSet());
                     
-                    while (occupiedTimes.contains(appointmentTime) && appointmentTime.isBefore(endOfDay)) {
-                        appointmentTime = appointmentTime.plusMinutes(30);
+                    // Tìm slot trống trong ngày này
+                    java.time.LocalTime tryTime = startTime;
+                    while (tryTime.isBefore(endTime)) {
+                        if (!dayOccupiedTimes.contains(tryTime)) {
+                            // Tìm được slot trống!
+                            appointmentTime = tryTime;
+                            finalDate = checkDate;
+                            break;
+                        }
+                        tryTime = tryTime.plusMinutes(30);
                     }
+                    
+                    // Nếu đã tìm được slot, thoát loop
+                    if (appointmentTime != null) {
+                        break;
+                    }
+                }
+                
+                // Nếu vẫn không tìm được slot sau 30 ngày, dùng ngày cuối + 9h
+                if (appointmentTime == null) {
+                    finalDate = date.plusDays(maxDaysToCheck);
+                    appointmentTime = startTime;
                 }
                 
                 Appointment appointment = new Appointment();
@@ -140,8 +156,6 @@ public class VaccinationService {
                 
                 if (appointmentDAO.createAppointment(appointment)) {
                     createdCount++;
-                    // Đánh dấu time này đã bị chiếm để vaccine tiếp theo không trùng
-                    occupiedTimes.add(appointmentTime);
                 }
             }
         }
