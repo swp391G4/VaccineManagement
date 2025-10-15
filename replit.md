@@ -136,6 +136,14 @@ This project follows the standard Maven structure and can be opened directly in 
 8. Generate digital vaccination certificates (PDF/QR)
 
 ## Recent Updates & Bug Fixes
+- ✅ **2025-10-15 (Evening)**: **CRITICAL BUG FIX - Auto-Schedule Logic**
+  - ✅ Fixed appointments being created too soon (same day as adding child)
+  - ✅ Fixed appointments overlapping for different children
+  - ✅ Implemented 2-day buffer: Appointments minimum 2 days from today
+  - ✅ Added robust slot-finding: System checks existing appointments across ALL children
+  - ✅ Multi-day advancement: If day full → advance to next day (up to 30 days)
+  - ✅ Infinite loop prevention: 30-day cap with graceful fallback
+  - ✅ AppointmentDAO.findByCenterAndDate() to prevent time conflicts
 - ✅ **2025-10-15**: **MAJOR UPDATE - Lich TCMR Chinh Xac + Vaccines Tra Phi**
   - ⚠️ **DATABASE UPDATE:** Chay file `database/schema.sql` de cap nhat database
   - Fixed vaccination schedule theo dung Chuong trinh TCMR Bo Y te Viet Nam (13 mui MIEN PHI)
@@ -168,6 +176,10 @@ This project follows the standard Maven structure and can be opened directly in 
   - FREE vaccines: Auto-created when adding child, calculated from DOB + ageInMonths
   - PAID vaccines: Parent must manually book via booking flow
   - Default center assigned for auto-created appointments
+  - **2-day buffer**: Appointments always scheduled minimum 2 days from today
+  - **Smart slot allocation**: System checks existing appointments and finds available time slots
+  - **Multi-day advancement**: If center fully booked, automatically moves to next available day (up to 30 days)
+  - **Conflict prevention**: Different children never get overlapping appointment times
 - Session-based authentication
 - Role-based access control implemented via servlets
 - Bootstrap 5 for responsive UI
@@ -180,4 +192,4 @@ This project follows the standard Maven structure and can be opened directly in 
 - Not recommended for production use
 - Always use password hashing (bcrypt, Argon2, etc.) in real applications
 
-Last Updated: 2025-10-14
+Last Updated: 2025-10-15
