@@ -141,13 +141,15 @@ CREATE TABLE StaffAssignments (
 );
 
 -- Appointments Table
+-- Note: AppointmentTime can be NULL for FREE vaccines (parent selects time later)
+-- CenterID can be NULL initially for auto-scheduled FREE vaccines (parent selects center later)
 CREATE TABLE Appointments (
     AppointmentID INT IDENTITY(1,1) PRIMARY KEY,
     ChildID INT NOT NULL,
     VaccineID INT NOT NULL,
-    CenterID INT NOT NULL,
+    CenterID INT NULL,
     AppointmentDate DATE NOT NULL,
-    AppointmentTime TIME NOT NULL,
+    AppointmentTime TIME NULL,
     Status NVARCHAR(20) DEFAULT 'PENDING' CHECK (Status IN ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW')),
     PaymentStatus NVARCHAR(20) DEFAULT 'UNPAID' CHECK (PaymentStatus IN ('UNPAID', 'PAID', 'REFUNDED')),
     PaymentAmount DECIMAL(10,2),
