@@ -6,7 +6,7 @@ public class VaccinationScheduleTemplate {
     private int templateId;
     private int vaccineId;
     private String stageName;
-    private int ageInMonths;
+    private double ageInMonths;
     private int doseNumber;
     private String description;
     private boolean isMandatory;
@@ -18,7 +18,7 @@ public class VaccinationScheduleTemplate {
     public VaccinationScheduleTemplate() {
     }
 
-    public VaccinationScheduleTemplate(int templateId, int vaccineId, String stageName, int ageInMonths, 
+    public VaccinationScheduleTemplate(int templateId, int vaccineId, String stageName, double ageInMonths, 
                                       int doseNumber, String description, boolean isMandatory, int displayOrder) {
         this.templateId = templateId;
         this.vaccineId = vaccineId;
@@ -54,11 +54,11 @@ public class VaccinationScheduleTemplate {
         this.stageName = stageName;
     }
 
-    public int getAgeInMonths() {
+    public double getAgeInMonths() {
         return ageInMonths;
     }
 
-    public void setAgeInMonths(int ageInMonths) {
+    public void setAgeInMonths(double ageInMonths) {
         this.ageInMonths = ageInMonths;
     }
 
