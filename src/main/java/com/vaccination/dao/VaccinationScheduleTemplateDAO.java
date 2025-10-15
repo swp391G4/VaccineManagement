@@ -10,7 +10,7 @@ import java.util.List;
 
 public class VaccinationScheduleTemplateDAO {
     
-    public List<VaccinationScheduleTemplate> findByAgeInMonths(int ageInMonths) {
+    public List<VaccinationScheduleTemplate> findByAgeInMonths(double ageInMonths) {
         List<VaccinationScheduleTemplate> templates = new ArrayList<>();
         String sql = "SELECT vst.*, v.* FROM VaccinationScheduleTemplate vst " +
                     "INNER JOIN Vaccines v ON vst.VaccineID = v.VaccineID " +
@@ -20,7 +20,7 @@ public class VaccinationScheduleTemplateDAO {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setInt(1, ageInMonths);
+            stmt.setDouble(1, ageInMonths);
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
@@ -36,7 +36,7 @@ public class VaccinationScheduleTemplateDAO {
         return templates;
     }
     
-    public List<VaccinationScheduleTemplate> findRecommendedForAge(int ageInMonths) {
+    public List<VaccinationScheduleTemplate> findRecommendedForAge(double ageInMonths) {
         List<VaccinationScheduleTemplate> templates = new ArrayList<>();
         String sql = "SELECT vst.TemplateID, vst.VaccineID, vst.StageName, vst.AgeInMonths, vst.DoseNumber, " +
                     "vst.Description AS TemplateDescription, vst.IsMandatory, vst.DisplayOrder, vst.IsActive AS TemplateIsActive, vst.CreatedAt AS TemplateCreatedAt, " +
@@ -50,7 +50,7 @@ public class VaccinationScheduleTemplateDAO {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setInt(1, ageInMonths);
+            stmt.setDouble(1, ageInMonths);
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
@@ -66,7 +66,7 @@ public class VaccinationScheduleTemplateDAO {
         return templates;
     }
     
-    public List<VaccinationScheduleTemplate> findMandatoryByAge(int ageInMonths) {
+    public List<VaccinationScheduleTemplate> findMandatoryByAge(double ageInMonths) {
         List<VaccinationScheduleTemplate> templates = new ArrayList<>();
         String sql = "SELECT vst.*, v.* FROM VaccinationScheduleTemplate vst " +
                     "INNER JOIN Vaccines v ON vst.VaccineID = v.VaccineID " +
@@ -76,7 +76,7 @@ public class VaccinationScheduleTemplateDAO {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setInt(1, ageInMonths);
+            stmt.setDouble(1, ageInMonths);
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
@@ -97,7 +97,7 @@ public class VaccinationScheduleTemplateDAO {
         template.setTemplateId(rs.getInt("TemplateID"));
         template.setVaccineId(rs.getInt("VaccineID"));
         template.setStageName(rs.getString("StageName"));
-        template.setAgeInMonths(rs.getInt("AgeInMonths"));
+        template.setAgeInMonths(rs.getDouble("AgeInMonths"));
         template.setDoseNumber(rs.getInt("DoseNumber"));
         
         try {

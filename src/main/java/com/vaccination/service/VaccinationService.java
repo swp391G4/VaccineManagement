@@ -19,10 +19,9 @@ public class VaccinationService {
     }
     
     /**
-     * Tự động tạo appointments cho TẤT CẢ vaccine MIỄN PHÍ phù hợp với độ tuổi của bé
-     * Được gọi khi:
-     * 1. Thêm bé mới vào hệ thống
-     * 2. Cập nhật thông tin bé (nếu cần)
+     * Tự động tạo appointments cho TẤT CẢ vaccine MIỄN PHÍ theo lịch TCMR
+     * Tạo TẤT CẢ appointments theo lịch tiêm (không phụ thuộc tuổi hiện tại)
+     * Được gọi khi: Thêm bé mới vào hệ thống
      * 
      * @param child Child object với thông tin ngày sinh
      * @return số lượng appointments được tạo
@@ -32,11 +31,20 @@ public class VaccinationService {
             return 0;
         }
         
-        // Lấy tất cả vaccine ĐÚNG tuổi hiện tại (exact match)
-        List<VaccinationScheduleTemplate> currentAgeTemplates = 
-            scheduleTemplateDAO.findMandatoryByAge(child.getAgeInMonths());
+        // Lấy TẤT CẢ vaccine MIỄN PHÍ từ lịch TCMR (từ 0 tháng trở đi)
+        List<VaccinationScheduleTemplate> allFreeTemplates = 
+            scheduleTemplateDAO.findRecommendedForAge(0);
         
-        if (currentAgeTemplates.isEmpty()) {
+        if (allFreeTemplates.isEmpty()) {
+            return 0;
+        }
+        
+        // Lọc chỉ lấy vaccine MIỄN PHÍ
+        List<VaccinationScheduleTemplate> freeTemplates = allFreeTemplates.stream()
+            .filter(t -> t.getVaccine() != null && t.getVaccine().isFree())
+            .collect(java.util.stream.Collectors.toList());
+        
+        if (freeTemplates.isEmpty()) {
             return 0;
         }
         
@@ -49,43 +57,58 @@ public class VaccinationService {
         
         int createdCount = 0;
         LocalDate childDOB = child.getDateOfBirth();
-        int timeOffset = 0;
         
-        for (VaccinationScheduleTemplate template : currentAgeTemplates) {
-            // Chỉ tạo appointment cho vaccine MIỄN PHÍ (IsFree = true)
-            if (template.getVaccine() != null && template.getVaccine().isFree()) {
+        // Group templates by date để xử lý staggered times cho vaccines cùng ngày
+        java.util.Map<LocalDate, java.util.List<VaccinationScheduleTemplate>> templatesByDate = 
+            new java.util.LinkedHashMap<>();
+        
+        for (VaccinationScheduleTemplate template : freeTemplates) {
+            // Kiểm tra xem đã có appointment cho vaccine này chưa
+            boolean alreadyScheduled = appointmentDAO.findByChildId(child.getChildId())
+                .stream()
+                .anyMatch(apt -> apt.getVaccineId() == template.getVaccineId());
+            
+            if (!alreadyScheduled) {
+                // Tính toán ngày tiêm dựa trên DOB + AgeInMonths
+                // AgeInMonths có thể là decimal (0.5, 12.5...)
+                int months = (int) template.getAgeInMonths();
+                int days = (int) ((template.getAgeInMonths() - months) * 30);
+                LocalDate vaccinationDate = childDOB.plusMonths(months).plusDays(days);
                 
-                // Kiểm tra xem đã có appointment cho vaccine này chưa
-                boolean alreadyScheduled = appointmentDAO.findByChildId(child.getChildId())
-                    .stream()
-                    .anyMatch(apt -> apt.getVaccineId() == template.getVaccineId());
+                // Nếu ngày tiêm đã qua, đặt vào ngày mai
+                if (vaccinationDate.isBefore(LocalDate.now())) {
+                    vaccinationDate = LocalDate.now().plusDays(1);
+                }
                 
-                if (!alreadyScheduled) {
-                    // Tính toán ngày tiêm dựa trên DOB + AgeInMonths
-                    LocalDate vaccinationDate = childDOB.plusMonths(template.getAgeInMonths());
-                    
-                    // Nếu ngày tiêm đã qua, đặt vào ngày mai
-                    if (vaccinationDate.isBefore(LocalDate.now())) {
-                        vaccinationDate = LocalDate.now().plusDays(1);
-                    }
-                    
-                    // Tạo appointment với thời gian staggered (mỗi vaccine cách nhau 30 phút)
-                    java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0).plusMinutes(timeOffset * 30);
-                    
-                    Appointment appointment = new Appointment();
-                    appointment.setChildId(child.getChildId());
-                    appointment.setVaccineId(template.getVaccineId());
-                    appointment.setCenterId(defaultCenter.getCenterId());
-                    appointment.setAppointmentDate(vaccinationDate);
-                    appointment.setAppointmentTime(appointmentTime);
-                    appointment.setStatus("PENDING");
-                    appointment.setNotes("Tự động tạo lịch tiêm cho vaccine miễn phí: " + 
-                                       template.getVaccine().getVaccineName());
-                    
-                    if (appointmentDAO.createAppointment(appointment)) {
-                        createdCount++;
-                        timeOffset++;
-                    }
+                // Group by date
+                templatesByDate.computeIfAbsent(vaccinationDate, k -> new java.util.ArrayList<>())
+                    .add(template);
+            }
+        }
+        
+        // Tạo appointments với staggered times cho vaccines cùng ngày
+        for (java.util.Map.Entry<LocalDate, java.util.List<VaccinationScheduleTemplate>> entry : templatesByDate.entrySet()) {
+            LocalDate date = entry.getKey();
+            java.util.List<VaccinationScheduleTemplate> templatesOnDate = entry.getValue();
+            
+            int timeOffset = 0;
+            for (VaccinationScheduleTemplate template : templatesOnDate) {
+                // Tạo appointment với thời gian staggered (mỗi vaccine cách nhau 30 phút)
+                java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0).plusMinutes(timeOffset * 30);
+                
+                Appointment appointment = new Appointment();
+                appointment.setChildId(child.getChildId());
+                appointment.setVaccineId(template.getVaccineId());
+                appointment.setCenterId(defaultCenter.getCenterId());
+                appointment.setAppointmentDate(date);
+                appointment.setAppointmentTime(appointmentTime);
+                appointment.setStatus("PENDING");
+                appointment.setNotes("Tu dong tao lich tiem TCMR: " + 
+                                   template.getVaccine().getVaccineName());
+                
+                if (appointmentDAO.createAppointment(appointment)) {
+                    createdCount++;
+                    timeOffset++;
                 }
             }
         }
