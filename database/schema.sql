@@ -373,15 +373,22 @@ INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, Dose
 -- Insert Sample Parent Users
 INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
 ('parent1@test.com', '123456', 'Nguyen Van A', '0901234567', 'PARENT', 1),
-('parent2@test.com', '123456', 'Tran Thi B', '0909876543', 'PARENT', 1);
+('parent2@test.com', '123456', 'Tran Thi B', '0909876543', 'PARENT', 1),
+('parent3@test.com', '123456', 'Le Hoang C', '0903456789', 'PARENT', 1),
+('parent4@test.com', '123456', 'Pham Minh D', '0904567890', 'PARENT', 1),
+('parent5@test.com', '123456', 'Vo Thi E', '0905678901', 'PARENT', 1);
 
 -- Insert Sample Reception Staff
 INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
-('reception1@test.com', '123456', 'Le Van C', '0912345678', 'RECEPTION', 1);
+('reception1@test.com', '123456', 'Le Van F', '0912345678', 'RECEPTION', 1),
+('reception2@test.com', '123456', 'Nguyen Thi G', '0913456789', 'RECEPTION', 1),
+('reception3@test.com', '123456', 'Tran Van H', '0914567890', 'RECEPTION', 1);
 
 -- Insert Sample Medical Staff
 INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
-('doctor1@test.com', '123456', 'Bac si Pham Thi D', '0923456789', 'MEDICAL', 1);
+('doctor1@test.com', '123456', 'Bac si Pham Thi I', '0923456789', 'MEDICAL', 1),
+('doctor2@test.com', '123456', 'Bac si Nguyen Van K', '0924567890', 'MEDICAL', 1),
+('doctor3@test.com', '123456', 'Bac si Tran Thi L', '0925678901', 'MEDICAL', 1);
 
 -- Insert Working Schedule for Centers
 INSERT INTO WorkingSchedule (CenterID, DayOfWeek, StartTime, EndTime, SlotDuration, IsActive) VALUES
@@ -399,10 +406,16 @@ INSERT INTO WorkingSchedule (CenterID, DayOfWeek, StartTime, EndTime, SlotDurati
 (2, 'Saturday', '07:00', '20:00', 30, 1),
 (2, 'Sunday', '07:00', '20:00', 30, 1);
 
--- Insert Staff Assignments
+-- Insert Staff Assignments (Reception + Medical Staff to Centers)
 INSERT INTO StaffAssignments (UserID, CenterID, IsActive) VALUES
-(3, 1, 1),
-(4, 2, 1);
+-- Reception staff
+(7, 1, 1),  -- reception1 at Center 1
+(8, 2, 1),  -- reception2 at Center 2
+(9, 3, 1),  -- reception3 at Center 3
+-- Medical staff
+(10, 1, 1), -- doctor1 at Center 1
+(11, 2, 1), -- doctor2 at Center 2
+(12, 3, 1); -- doctor3 at Center 3
 
 -- Insert Sample Vaccine Stock
 INSERT INTO VaccineStock (VaccineID, CenterID, BatchNumber, Quantity, ExpiryDate, Status) VALUES
