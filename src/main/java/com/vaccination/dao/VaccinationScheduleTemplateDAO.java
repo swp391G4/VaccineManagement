@@ -44,8 +44,8 @@ public class VaccinationScheduleTemplateDAO {
                     "v.RecommendedAge, v.Price, v.IsFree, v.IsActive, v.SideEffects, v.Contraindications, v.CreatedAt " +
                     "FROM VaccinationScheduleTemplate vst " +
                     "INNER JOIN Vaccines v ON vst.VaccineID = v.VaccineID " +
-                    "WHERE vst.AgeInMonths <= ? AND v.IsActive = 1 " +
-                    "ORDER BY vst.StageName, vst.DisplayOrder";
+                    "WHERE vst.AgeInMonths >= ? AND v.IsActive = 1 " +
+                    "ORDER BY vst.AgeInMonths, vst.DisplayOrder";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
