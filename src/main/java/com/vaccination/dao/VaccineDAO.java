@@ -45,6 +45,42 @@ public class VaccineDAO {
         return vaccines;
     }
 
+    public List<Vaccine> getPaidVaccines() {
+        List<Vaccine> vaccines = new ArrayList<>();
+        String sql = "SELECT * FROM Vaccines WHERE IsActive = 1 AND IsFree = 0 ORDER BY VaccineName";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                vaccines.add(extractVaccineFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vaccines;
+    }
+
+    public List<Vaccine> getFreeVaccines() {
+        List<Vaccine> vaccines = new ArrayList<>();
+        String sql = "SELECT * FROM Vaccines WHERE IsActive = 1 AND IsFree = 1 ORDER BY VaccineName";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                vaccines.add(extractVaccineFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vaccines;
+    }
+
     public List<Vaccine> searchVaccines(String keyword) {
         List<Vaccine> vaccines = new ArrayList<>();
         String sql = "SELECT * FROM Vaccines WHERE IsActive = 1 AND " +

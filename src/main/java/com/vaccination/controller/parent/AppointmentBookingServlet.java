@@ -82,7 +82,7 @@ public class AppointmentBookingServlet extends HttpServlet {
     private void showStep1(HttpServletRequest request, HttpServletResponse response, User user)
             throws ServletException, IOException {
         List<Child> children = childDAO.findByParentId(user.getUserId());
-        List<Vaccine> vaccines = vaccineDAO.getAllVaccines();
+        List<Vaccine> vaccines = vaccineDAO.getPaidVaccines();
         
         request.setAttribute("children", children);
         request.setAttribute("vaccines", vaccines);
