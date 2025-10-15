@@ -58,6 +58,10 @@ public class VaccinationService {
         int createdCount = 0;
         LocalDate childDOB = child.getDateOfBirth();
         
+        // Đảm bảo appointments cách ít nhất 2 ngày từ ngày hiện tại
+        // (Không tiêm ngay trong ngày thêm trẻ, cần thời gian chuẩn bị)
+        LocalDate earliestAllowedDate = LocalDate.now().plusDays(2);
+        
         // Group templates by date để xử lý staggered times cho vaccines cùng ngày
         java.util.Map<LocalDate, java.util.List<VaccinationScheduleTemplate>> templatesByDate = 
             new java.util.LinkedHashMap<>();
@@ -75,9 +79,9 @@ public class VaccinationService {
                 int days = (int) ((template.getAgeInMonths() - months) * 30);
                 LocalDate vaccinationDate = childDOB.plusMonths(months).plusDays(days);
                 
-                // Nếu ngày tiêm đã qua, đặt vào ngày mai
-                if (vaccinationDate.isBefore(LocalDate.now())) {
-                    vaccinationDate = LocalDate.now().plusDays(1);
+                // ĐẢM BẢO ngày tiêm cách ít nhất 2 ngày từ hôm nay
+                if (vaccinationDate.isBefore(earliestAllowedDate)) {
+                    vaccinationDate = earliestAllowedDate;
                 }
                 
                 // Group by date
@@ -87,14 +91,23 @@ public class VaccinationService {
         }
         
         // Tạo appointments với staggered times cho vaccines cùng ngày
+        // ĐẢM BẢO không trùng giờ với appointments của trẻ khác
         for (java.util.Map.Entry<LocalDate, java.util.List<VaccinationScheduleTemplate>> entry : templatesByDate.entrySet()) {
             LocalDate date = entry.getKey();
             java.util.List<VaccinationScheduleTemplate> templatesOnDate = entry.getValue();
             
-            int timeOffset = 0;
+            // Lấy danh sách appointments đã tồn tại trong ngày này tại center
+            List<Appointment> existingAppointments = appointmentDAO.findByCenterAndDate(defaultCenter.getCenterId(), date);
+            java.util.Set<java.time.LocalTime> occupiedTimes = existingAppointments.stream()
+                .map(Appointment::getAppointmentTime)
+                .collect(java.util.stream.Collectors.toSet());
+            
             for (VaccinationScheduleTemplate template : templatesOnDate) {
-                // Tạo appointment với thời gian staggered (mỗi vaccine cách nhau 30 phút)
-                java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0).plusMinutes(timeOffset * 30);
+                // Tìm slot trống đầu tiên, bắt đầu từ 9h00
+                java.time.LocalTime appointmentTime = java.time.LocalTime.of(9, 0);
+                while (occupiedTimes.contains(appointmentTime)) {
+                    appointmentTime = appointmentTime.plusMinutes(30);
+                }
                 
                 Appointment appointment = new Appointment();
                 appointment.setChildId(child.getChildId());
@@ -108,7 +121,8 @@ public class VaccinationService {
                 
                 if (appointmentDAO.createAppointment(appointment)) {
                     createdCount++;
-                    timeOffset++;
+                    // Đánh dấu time này đã bị chiếm để vaccine tiếp theo không trùng
+                    occupiedTimes.add(appointmentTime);
                 }
             }
         }
