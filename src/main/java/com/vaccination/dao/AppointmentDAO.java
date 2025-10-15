@@ -165,6 +165,26 @@ public class AppointmentDAO {
         return false;
     }
 
+    public List<Appointment> findByCenterAndDate(int centerId, java.time.LocalDate date) {
+        List<Appointment> appointments = new ArrayList<>();
+        String sql = "SELECT * FROM Appointments WHERE CenterID = ? AND AppointmentDate = ? AND Status != 'CANCELLED' ORDER BY AppointmentTime";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, centerId);
+            stmt.setDate(2, Date.valueOf(date));
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                appointments.add(extractAppointmentFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return appointments;
+    }
+
     private Appointment extractAppointmentFromResultSet(ResultSet rs) throws SQLException {
         Appointment appointment = new Appointment();
         appointment.setAppointmentId(rs.getInt("AppointmentID"));
