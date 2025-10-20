@@ -236,4 +236,36 @@ public class AppointmentDAO {
         
         return appointment;
     }
+    public List<Appointment> getAll() {
+        List<Appointment> appointments = new ArrayList<>();
+        String sql = "SELECT * FROM Appointments ORDER BY AppointmentDate DESC, AppointmentTime DESC";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                appointments.add(extractAppointmentFromResultSet(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return appointments;
+    }   
+    
+    public void updateNotes(int appointmentId, String notes) {
+        String sql = "UPDATE Appointments SET Notes = ?, UpdatedAt = GETDATE() WHERE AppointmentID = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, notes);
+            stmt.setInt(2, appointmentId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    
 }
