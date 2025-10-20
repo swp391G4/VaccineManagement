@@ -12,6 +12,7 @@ public class Vaccine {
     private String dosageSchedule;
     private String recommendedAge;
     private BigDecimal price;
+    private boolean isFree;
     private boolean isActive;
     private String sideEffects;
     private String contraindications;
@@ -90,6 +91,14 @@ public class Vaccine {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public boolean isFree() {
+        return isFree;
+    }
+
+    public void setFree(boolean free) {
+        isFree = free;
     }
 
     public boolean isActive() {

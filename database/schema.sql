@@ -1,22 +1,28 @@
--- Child Vaccination Management System - MSSQL Database Schema
+-- ============================================
+-- Child Vaccination Management System
+-- MSSQL Database Schema - LICH TIEM TCMR CHINH XAC
+-- ============================================
+-- HUONG DAN: Chay file nay de tao database hoan chinh
+-- Admin login: admin@vaccination.com / Admin@123
+-- ============================================
 
--- Drop existing tables if they exist
-IF OBJECT_ID('VaccinationRecords', 'U') IS NOT NULL DROP TABLE VaccinationRecords;
-IF OBJECT_ID('Appointments', 'U') IS NOT NULL DROP TABLE Appointments;
-IF OBJECT_ID('VaccineStock', 'U') IS NOT NULL DROP TABLE VaccineStock;
-IF OBJECT_ID('StaffAssignments', 'U') IS NOT NULL DROP TABLE StaffAssignments;
-IF OBJECT_ID('WorkingSchedule', 'U') IS NOT NULL DROP TABLE WorkingSchedule;
-IF OBJECT_ID('Notifications', 'U') IS NOT NULL DROP TABLE Notifications;
-IF OBJECT_ID('Children', 'U') IS NOT NULL DROP TABLE Children;
-IF OBJECT_ID('Vaccines', 'U') IS NOT NULL DROP TABLE Vaccines;
-IF OBJECT_ID('Centers', 'U') IS NOT NULL DROP TABLE Centers;
-IF OBJECT_ID('Users', 'U') IS NOT NULL DROP TABLE Users;
+-- Step 1: Drop existing database if exists (de tao moi hoan toan)
+USE master;
+GO
 
--- Create Database if not exists
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'VaccinationDB')
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'VaccinationDB')
 BEGIN
-    CREATE DATABASE VaccinationDB;
+    ALTER DATABASE VaccinationDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE VaccinationDB;
+    PRINT 'Database cu da duoc xoa';
 END
+GO
+
+-- Step 2: Create new database
+CREATE DATABASE VaccinationDB;
+GO
+
+PRINT 'Database moi da duoc tao';
 GO
 
 USE VaccinationDB;
@@ -26,7 +32,7 @@ GO
 CREATE TABLE Users (
     UserID INT IDENTITY(1,1) PRIMARY KEY,
     Email NVARCHAR(100) UNIQUE NOT NULL,
-    PasswordHash NVARCHAR(255) NOT NULL,
+    Password NVARCHAR(255) NOT NULL,
     FullName NVARCHAR(100) NOT NULL,
     PhoneNumber NVARCHAR(20),
     Role NVARCHAR(20) NOT NULL CHECK (Role IN ('ADMIN', 'RECEPTION', 'MEDICAL', 'PARENT')),
@@ -63,11 +69,13 @@ CREATE TABLE Vaccines (
     DosageSchedule NVARCHAR(500),
     RecommendedAge NVARCHAR(100),
     Price DECIMAL(10,2) DEFAULT 0,
+    IsFree BIT DEFAULT 0,
     IsActive BIT DEFAULT 1,
     SideEffects NVARCHAR(MAX),
     Contraindications NVARCHAR(MAX),
     CreatedAt DATETIME DEFAULT GETDATE(),
-    INDEX idx_active (IsActive)
+    INDEX idx_active (IsActive),
+    INDEX idx_free (IsFree)
 );
 
 -- Children Table
@@ -133,13 +141,15 @@ CREATE TABLE StaffAssignments (
 );
 
 -- Appointments Table
+-- Note: AppointmentTime can be NULL for FREE vaccines (parent selects time later)
+-- CenterID can be NULL initially for auto-scheduled FREE vaccines (parent selects center later)
 CREATE TABLE Appointments (
     AppointmentID INT IDENTITY(1,1) PRIMARY KEY,
     ChildID INT NOT NULL,
     VaccineID INT NOT NULL,
-    CenterID INT NOT NULL,
+    CenterID INT NULL,
     AppointmentDate DATE NOT NULL,
-    AppointmentTime TIME NOT NULL,
+    AppointmentTime TIME NULL,
     Status NVARCHAR(20) DEFAULT 'PENDING' CHECK (Status IN ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW')),
     PaymentStatus NVARCHAR(20) DEFAULT 'UNPAID' CHECK (PaymentStatus IN ('UNPAID', 'PAID', 'REFUNDED')),
     PaymentAmount DECIMAL(10,2),
@@ -196,48 +206,229 @@ CREATE TABLE Notifications (
     INDEX idx_user_read (UserID, IsRead)
 );
 
+-- Vaccination Schedule Template (Lich khuyen nghi tiem chung TCMR)
+CREATE TABLE VaccinationScheduleTemplate (
+    TemplateID INT IDENTITY(1,1) PRIMARY KEY,
+    VaccineID INT NOT NULL,
+    StageName NVARCHAR(200) NOT NULL,
+    AgeInMonths DECIMAL(5,2) NOT NULL,
+    DoseNumber INT NOT NULL,
+    Description NVARCHAR(MAX),
+    IsMandatory BIT DEFAULT 1,
+    DisplayOrder INT,
+    CanCombineWith NVARCHAR(500),
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (VaccineID) REFERENCES Vaccines(VaccineID),
+    INDEX idx_age (AgeInMonths),
+    INDEX idx_vaccine (VaccineID)
+);
+
 -- Insert Default Admin User (password: Admin@123)
-INSERT INTO Users (Email, PasswordHash, FullName, PhoneNumber, Role, IsActive) 
-VALUES ('admin@vaccination.com', 
-        'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f',
-        'System Administrator', 
-        '0123456789', 
-        'ADMIN', 
-        1);
+INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) 
+VALUES ('admin@vaccination.com', 'Admin@123', 'System Administrator', '0900000000', 'ADMIN', 1);
 
--- Insert Sample Vaccination Centers
-INSERT INTO Centers (CenterName, Address, City, PhoneNumber, Email, OperatingHours, Capacity) VALUES
-('Hanoi Vaccination Center', '123 Hoang Quoc Viet, Cau Giay', 'Hanoi', '024-1234-5678', 'hanoi@vaccination.com', 'Mon-Sat: 8:00-17:00', 100),
-('District 1 Medical Center', '456 Nguyen Trai, Thanh Xuan', 'Hanoi', '024-2345-6789', 'district1@vaccination.com', 'Mon-Fri: 8:00-18:00', 80),
-('Children Hospital Center', '789 La Thanh, Dong Da', 'Hanoi', '024-3456-7890', 'children@vaccination.com', 'Mon-Sun: 7:00-19:00', 150);
+-- Insert Sample Centers
+INSERT INTO Centers (CenterName, Address, City, PhoneNumber, Email, OperatingHours, IsActive) VALUES
+('Trung tam Y te Quan 1', '123 Le Loi, Quan 1', 'Ho Chi Minh', '0283822222', 'q1@health.gov.vn', 'Mon-Sat: 7:00-17:00', 1),
+('Benh vien Nhi Dong 1', '341 Su Van Hanh, Quan 10', 'Ho Chi Minh', '0283865100', 'nhi1@health.gov.vn', 'Mon-Sun: 7:00-20:00', 1),
+('Trung tam Y te Du phong TP.HCM', '159 Hung Phu, Quan 8', 'Ho Chi Minh', '0283855555', 'yte-dp@health.gov.vn', 'Mon-Fri: 7:00-16:30', 1);
 
--- Insert Common Vaccines
-INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, RecommendedAge, Price) VALUES
-('BCG Vaccine', 'Serum Institute', 'Bacillus Calmette-Guérin vaccine', 'Tuberculosis', '0-12 months', 50000),
-('Hepatitis B', 'GSK', 'Hepatitis B vaccine', 'Hepatitis B', '0-6 months', 80000),
-('DPT Vaccine', 'Sanofi Pasteur', 'Diphtheria, Pertussis, Tetanus vaccine', 'Diphtheria, Pertussis, Tetanus', '2-6 months', 120000),
-('Polio Vaccine', 'Serum Institute', 'Oral Polio Vaccine', 'Poliomyelitis', '2-18 months', 60000),
-('MMR Vaccine', 'Merck', 'Measles, Mumps, Rubella vaccine', 'Measles, Mumps, Rubella', '9-18 months', 200000),
-('Varicella Vaccine', 'GSK', 'Chickenpox vaccine', 'Chickenpox', '12-24 months', 350000),
-('Pneumococcal', 'Pfizer', 'Pneumococcal conjugate vaccine', 'Pneumococcal diseases', '2-12 months', 1200000),
-('Rotavirus', 'GSK', 'Rotavirus vaccine', 'Rotavirus gastroenteritis', '2-6 months', 800000);
+-- ============================================
+-- VACCINES - LICH TIEM TCMR CHINH XAC
+-- ============================================
+
+-- VACCINE MIEN PHI (IsFree = 1)
+INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, DosageSchedule, RecommendedAge, Price, IsFree, IsActive) VALUES
+-- 0-24 gio
+('Viem gan B (mui so sinh)', 'Vac-xin Viet Nam', 'Vaccine phong viem gan B cho tre so sinh', 'Viem gan B', 'Tiem trong 24 gio dau sau sinh', '0-24 gio', 0, 1, 1),
+-- Trong 1 thang
+('Lao (BCG)', 'Vac-xin Viet Nam', 'Vaccine phong benh lao', 'Lao', 'Tiem 1 mui trong thang dau', '0-1 thang', 0, 1, 1),
+-- 2 thang
+('5 trong 1 (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 1/4 - tiem o 2 thang tuoi', '2 thang', 0, 1, 1),
+-- 3 thang  
+('5 trong 1 (mui 2)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 2/4 - tiem o 3 thang tuoi', '3 thang', 0, 1, 1),
+-- 4 thang
+('5 trong 1 (mui 3)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 3/4 - tiem o 4 thang tuoi', '4 thang', 0, 1, 1),
+-- 5 thang
+('Bai liet IPV (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong bai liet (tiem)', 'Bai liet', 'Tiem mui 1 o 5 thang tuoi', '5 thang', 0, 1, 1),
+-- 9 thang
+('Soi (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong benh soi', 'Soi', 'Tiem mui 1 o 9 thang tuoi', '9 thang', 0, 1, 1),
+-- 12 thang
+('Viem nao Nhat Ban (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong viem nao Nhat Ban', 'Viem nao Nhat Ban', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 0, 1, 1),
+-- 12.5 thang (12 thang + 1-2 tuan)
+('Viem nao Nhat Ban (mui 2)', 'Vac-xin Viet Nam', 'Vaccine phong viem nao Nhat Ban', 'Viem nao Nhat Ban', 'Tiem mui 2 cach mui 1 tu 1-2 tuan', '12.5 thang', 0, 1, 1),
+-- 18 thang
+('5 trong 1 (mui nhac lai)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B - nhac lai', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 4/4 - nhac lai o 18 thang', '18 thang', 0, 1, 1),
+('Soi - Rubella MR (mui 2)', 'Vac-xin Viet Nam', 'Vaccine phong soi va rubella', 'Soi, Rubella', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 0, 1, 1),
+-- 24 thang
+('Viem nao Nhat Ban (mui 3)', 'Vac-xin Viet Nam', 'Vaccine phong viem nao Nhat Ban', 'Viem nao Nhat Ban', 'Tiem mui 3 cach mui 2 mot nam', '24 thang', 0, 1, 1),
+-- 7 tuoi (84 thang)
+('Bach hau - Uon van giam lieu (Td)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau va uon van giam lieu', 'Bach hau, Uon van', 'Tiem nhac lai o 7 tuoi', '7 tuoi', 0, 1, 1);
+
+-- VACCINE TRA PHI (IsFree = 0) - DICH VU
+INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, DosageSchedule, RecommendedAge, Price, IsFree, IsActive) VALUES
+-- 2 thang
+('Rota (lieu 1)', 'GSK/Rotarix', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 1 o 2 thang tuoi', '2 thang', 700000, 0, 1),
+('Phe cau (mui 1)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 1 o 2 thang tuoi', '2 thang', 1200000, 0, 1),
+-- 3 thang
+('Rota (lieu 2)', 'GSK/Rotarix', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 2 o 3 thang tuoi', '3 thang', 700000, 0, 1),
+('Phe cau (mui 2)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 2 o 3 thang tuoi', '3 thang', 1200000, 0, 1),
+-- 4 thang (neu uong 3 lieu Rota)
+('Rota (lieu 3)', 'Merck/RotaTeq', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 3 o 4 thang tuoi (neu dung loai 3 lieu)', '4 thang', 750000, 0, 1),
+-- 5 thang
+('Phe cau (mui 3)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 3 o 5 thang tuoi', '5 thang', 1200000, 0, 1),
+-- 6 thang
+('Cum mua (mui 1)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem mui 1 o 6 thang tuoi', '6 thang', 350000, 0, 1),
+-- 7 thang
+('Cum mua (mui 2)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem mui 2 o 7 thang tuoi (giu mien dich 1 nam)', '7 thang', 350000, 0, 1),
+-- 12 thang
+('MMRV (mui 1)', 'GSK/Priorix-Tetra', 'Vaccine phong soi, quai bi, rubella, thuy dau', 'Soi, Quai bi, Rubella, Thuy dau', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 1200000, 0, 1),
+('Viem mang nao mo cau (mui 1)', 'GSK/Bexsero', 'Vaccine phong viem mang nao do mo cau', 'Viem mang nao mo cau (BC hoac ACYW)', 'Tiem sau 9-12 thang tuoi', '12 thang', 1000000, 0, 1),
+('Viem gan A (mui 1)', 'GSK/Havrix', 'Vaccine phong viem gan A', 'Viem gan A', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 700000, 0, 1),
+('Thuy dau (mui 1)', 'GSK/Varilrix', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 450000, 0, 1),
+-- 15 thang
+('Phe cau (mui nhac lai)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 4 nhac lai o 15 thang tuoi', '15 thang', 1200000, 0, 1),
+-- 18 thang
+('MMRV (mui 2)', 'GSK/Priorix-Tetra', 'Vaccine phong soi, quai bi, rubella, thuy dau', 'Soi, Quai bi, Rubella, Thuy dau', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 1200000, 0, 1),
+('Thuy dau (mui 2)', 'GSK/Varilrix', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 450000, 0, 1),
+-- 24 thang (2 tuoi)
+('Viem gan A (mui 2)', 'GSK/Havrix', 'Vaccine phong viem gan A', 'Viem gan A', 'Tiem mui 2 o 24 thang tuoi (2 tuoi)', '24 thang', 700000, 0, 1),
+('Thuong han', 'Sanofi/Typhim Vi', 'Vaccine phong benh thuong han', 'Thuong han', 'Tiem o 24 thang tuoi (2 tuoi)', '24 thang', 600000, 0, 1),
+-- 3-6 tuoi (36-72 thang)
+('Cum mua (nhac hang nam)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem nhac moi nam tu 3-6 tuoi', '36 thang', 350000, 0, 1),
+('Viem mang nao mo cau (nhac)', 'GSK/Bexsero', 'Vaccine phong viem mang nao do mo cau', 'Viem mang nao mo cau', 'Tiem nhac lai (tuy loai vaccine)', '48 thang', 1000000, 0, 1),
+-- 9-14 tuoi (108-168 thang) - be gai
+('HPV (mui 1)', 'MSD/Gardasil 9', 'Vaccine phong ung thu co tu cung', 'HPV (9 chung)', 'Tiem mui 1 cho be gai 9-14 tuoi', '108 thang', 2000000, 0, 1),
+('HPV (mui 2)', 'MSD/Gardasil 9', 'Vaccine phong ung thu co tu cung', 'HPV (9 chung)', 'Tiem mui 2 cho be gai 9-14 tuoi (cach mui 1 khoang 6 thang)', '114 thang', 2000000, 0, 1),
+-- Vaccine thay the (tu nguyen)
+('6 trong 1', 'GSK/Infanrix Hexa', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B, bai liet', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B, Bai liet', 'Thay the 5 trong 1 (tu nguyen)', '2 thang', 850000, 0, 1);
+
+-- ============================================
+-- VACCINATION SCHEDULE TEMPLATE - LICH TCMR
+-- ============================================
+
+-- 0-24 GIO SAU SINH (AgeInMonths = 0)
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(1, '0-24 gio sau sinh', 0, 1, 'Tiem 1 mui duy nhat trong 24 gio dau', 1, 1, NULL);
+
+-- TRONG 1 THANG DAU (AgeInMonths = 0.5 ~ 2 tuan)
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(2, 'Trong 1 thang dau', 0.5, 1, 'Tiem 1 mui (cach vaccine viem gan B it nhat 24h)', 1, 2, NULL);
+
+-- 2 THANG TUOI
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(3, '2 thang tuoi', 2, 1, '5 trong 1 - mui 1', 1, 3, '15'),
+(15, '2 thang tuoi', 2, 1, 'Rota - lieu 1 (dich vu, tu nguyen)', 0, 4, '3'),
+(17, '2 thang tuoi', 2, 1, 'Phe cau - mui 1 (dich vu, tu nguyen)', 0, 5, '3,15');
+
+-- 3 THANG TUOI
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(4, '3 thang tuoi', 3, 2, '5 trong 1 - mui 2', 1, 6, '16'),
+(16, '3 thang tuoi', 3, 2, 'Rota - lieu 2 (dich vu, tu nguyen)', 0, 7, '4');
+
+-- 4 THANG TUOI
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(5, '4 thang tuoi', 4, 3, '5 trong 1 - mui 3', 1, 8, '18'),
+(18, '4 thang tuoi', 4, 2, 'Phe cau - mui 2 (dich vu, tu nguyen)', 0, 9, '5');
+
+-- 5 THANG TUOI
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(6, '5 thang tuoi', 5, 1, 'Bai liet IPV - tiem mui 1', 1, 10, NULL);
+
+-- 6 THANG TUOI (chi co vaccine tra phi)
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(19, '6 thang tuoi', 6, 3, 'Phe cau - mui 3 (dich vu, tu nguyen)', 0, 11, '23'),
+(23, '6 thang tuoi', 6, 1, 'Cum - hang nam (dich vu, tu nguyen)', 0, 12, '19');
+
+-- 9 THANG TUOI
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(7, '9 thang tuoi', 9, 1, 'Soi - mui 1 (vaccine song)', 1, 13, NULL);
+
+-- 12 THANG TUOI
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(8, '12 thang tuoi', 12, 1, 'Viem nao Nhat Ban - mui 1', 1, 14, '20,21'),
+(20, '12 thang tuoi', 12, 4, 'Phe cau - mui nhac lai (dich vu)', 0, 15, '8,21'),
+(21, '12 thang tuoi', 12, 1, 'Thuy dau - mui 1 (dich vu)', 0, 16, '8,20');
+
+-- 12.5 THANG (12 THANG + 1-2 TUAN)
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(9, '12 thang + 1-2 tuan', 12.5, 2, 'Viem nao Nhat Ban - mui 2 (cach mui 1 tu 1-2 tuan)', 1, 17, NULL);
+
+-- 18 THANG TUOI
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(10, '18 thang tuoi', 18, 4, '5 trong 1 - mui nhac lai', 1, 18, '11'),
+(11, '18 thang tuoi', 18, 2, 'Soi-Rubella (MR) - mui 2', 1, 19, '10'),
+(22, '18 thang tuoi', 18, 2, 'Thuy dau - mui 2 (dich vu)', 0, 20, NULL);
+
+-- 24 THANG TUOI (2 TUOI)
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(12, '24 thang tuoi (2 tuoi)', 24, 3, 'Viem nao Nhat Ban - mui 3 (cach mui 2 mot nam)', 1, 21, NULL);
+
+-- 7 TUOI (84 THANG - LOP 2)
+INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
+(13, '7 tuoi (lop 2)', 84, 1, 'Bach hau - Uon van giam lieu (Td) - mui nhac lai', 1, 22, NULL);
+
+-- ============================================
+-- SAMPLE DATA
+-- ============================================
+
+-- Insert Sample Parent Users
+INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
+('parent1@test.com', '123456', 'Nguyen Van A', '0901234567', 'PARENT', 1),
+('parent2@test.com', '123456', 'Tran Thi B', '0909876543', 'PARENT', 1),
+('parent3@test.com', '123456', 'Le Hoang C', '0903456789', 'PARENT', 1),
+('parent4@test.com', '123456', 'Pham Minh D', '0904567890', 'PARENT', 1),
+('parent5@test.com', '123456', 'Vo Thi E', '0905678901', 'PARENT', 1);
+
+-- Insert Sample Reception Staff
+INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
+('reception1@test.com', '123456', 'Le Van F', '0912345678', 'RECEPTION', 1),
+('reception2@test.com', '123456', 'Nguyen Thi G', '0913456789', 'RECEPTION', 1),
+('reception3@test.com', '123456', 'Tran Van H', '0914567890', 'RECEPTION', 1);
+
+-- Insert Sample Medical Staff
+INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
+('doctor1@test.com', '123456', 'Bac si Pham Thi I', '0923456789', 'MEDICAL', 1),
+('doctor2@test.com', '123456', 'Bac si Nguyen Van K', '0924567890', 'MEDICAL', 1),
+('doctor3@test.com', '123456', 'Bac si Tran Thi L', '0925678901', 'MEDICAL', 1);
+
+-- Insert Working Schedule for Centers
+INSERT INTO WorkingSchedule (CenterID, DayOfWeek, StartTime, EndTime, SlotDuration, IsActive) VALUES
+(1, 'Monday', '08:00', '17:00', 30, 1),
+(1, 'Tuesday', '08:00', '17:00', 30, 1),
+(1, 'Wednesday', '08:00', '17:00', 30, 1),
+(1, 'Thursday', '08:00', '17:00', 30, 1),
+(1, 'Friday', '08:00', '17:00', 30, 1),
+(1, 'Saturday', '08:00', '12:00', 30, 1),
+(2, 'Monday', '07:00', '20:00', 30, 1),
+(2, 'Tuesday', '07:00', '20:00', 30, 1),
+(2, 'Wednesday', '07:00', '20:00', 30, 1),
+(2, 'Thursday', '07:00', '20:00', 30, 1),
+(2, 'Friday', '07:00', '20:00', 30, 1),
+(2, 'Saturday', '07:00', '20:00', 30, 1),
+(2, 'Sunday', '07:00', '20:00', 30, 1);
+
+-- Insert Staff Assignments (Reception + Medical Staff to Centers)
+INSERT INTO StaffAssignments (UserID, CenterID, IsActive) VALUES
+-- Reception staff
+(7, 1, 1),  -- reception1 at Center 1
+(8, 2, 1),  -- reception2 at Center 2
+(9, 3, 1),  -- reception3 at Center 3
+-- Medical staff
+(10, 1, 1), -- doctor1 at Center 1
+(11, 2, 1), -- doctor2 at Center 2
+(12, 3, 1); -- doctor3 at Center 3
 
 -- Insert Sample Vaccine Stock
 INSERT INTO VaccineStock (VaccineID, CenterID, BatchNumber, Quantity, ExpiryDate, Status) VALUES
-(1, 1, 'BCG2024001', 500, '2025-12-31', 'AVAILABLE'),
-(2, 1, 'HBV2024001', 400, '2025-11-30', 'AVAILABLE'),
-(3, 1, 'DPT2024001', 300, '2025-10-31', 'AVAILABLE'),
-(1, 2, 'BCG2024002', 300, '2025-12-31', 'AVAILABLE'),
-(2, 2, 'HBV2024002', 250, '2025-11-30', 'AVAILABLE'),
-(5, 3, 'MMR2024001', 200, '2025-09-30', 'AVAILABLE');
+(1, 1, 'HBV2024001', 500, '2025-12-31', 'AVAILABLE'),
+(2, 1, 'BCG2024001', 300, '2025-12-31', 'AVAILABLE'),
+(3, 1, '5IN12024001', 400, '2025-12-31', 'AVAILABLE'),
+(7, 1, 'MEASLES2024001', 250, '2025-12-31', 'AVAILABLE'),
+(8, 1, 'JE2024001', 200, '2025-12-31', 'AVAILABLE'),
+(1, 2, 'HBV2024002', 600, '2025-12-31', 'AVAILABLE'),
+(2, 2, 'BCG2024002', 400, '2025-12-31', 'AVAILABLE'),
+(3, 2, '5IN12024002', 500, '2025-12-31', 'AVAILABLE');
 
--- Insert Working Schedules
-INSERT INTO WorkingSchedule (CenterID, DayOfWeek, StartTime, EndTime, SlotDuration) VALUES
-(1, 'Monday', '08:00', '17:00', 30),
-(1, 'Tuesday', '08:00', '17:00', 30),
-(1, 'Wednesday', '08:00', '17:00', 30),
-(1, 'Thursday', '08:00', '17:00', 30),
-(1, 'Friday', '08:00', '17:00', 30),
-(1, 'Saturday', '08:00', '12:00', 30);
-
+PRINT 'Database setup completed with TCMR vaccination schedule!';
 GO

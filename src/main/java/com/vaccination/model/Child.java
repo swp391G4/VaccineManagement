@@ -20,6 +20,7 @@ public class Child {
     private LocalDateTime updatedAt;
 
     public Child() {
+        this.isActive = true;
     }
 
     public Child(int childId, int parentId, String fullName, LocalDate dateOfBirth, String gender) {
@@ -139,6 +140,14 @@ public class Child {
         if (dateOfBirth == null) return 0;
         LocalDate now = LocalDate.now();
         return (int) java.time.temporal.ChronoUnit.MONTHS.between(dateOfBirth, now);
+    }
+
+    public int getAgeYears() {
+        return getAgeInMonths() / 12;
+    }
+
+    public int getAgeRemainingMonths() {
+        return getAgeInMonths() % 12;
     }
 
     @Override

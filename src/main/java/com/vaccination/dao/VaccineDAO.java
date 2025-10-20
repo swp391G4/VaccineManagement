@@ -45,6 +45,42 @@ public class VaccineDAO {
         return vaccines;
     }
 
+    public List<Vaccine> getPaidVaccines() {
+        List<Vaccine> vaccines = new ArrayList<>();
+        String sql = "SELECT * FROM Vaccines WHERE IsActive = 1 AND IsFree = 0 ORDER BY VaccineName";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                vaccines.add(extractVaccineFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vaccines;
+    }
+
+    public List<Vaccine> getFreeVaccines() {
+        List<Vaccine> vaccines = new ArrayList<>();
+        String sql = "SELECT * FROM Vaccines WHERE IsActive = 1 AND IsFree = 1 ORDER BY VaccineName";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                vaccines.add(extractVaccineFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vaccines;
+    }
+
     public List<Vaccine> searchVaccines(String keyword) {
         List<Vaccine> vaccines = new ArrayList<>();
         String sql = "SELECT * FROM Vaccines WHERE IsActive = 1 AND " +
@@ -71,8 +107,8 @@ public class VaccineDAO {
 
     public boolean createVaccine(Vaccine vaccine) {
         String sql = "INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, " +
-                     "DosageSchedule, RecommendedAge, Price, IsActive, SideEffects, Contraindications) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                     "DosageSchedule, RecommendedAge, Price, IsFree, IsActive, SideEffects, Contraindications) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -84,9 +120,10 @@ public class VaccineDAO {
             stmt.setString(5, vaccine.getDosageSchedule());
             stmt.setString(6, vaccine.getRecommendedAge());
             stmt.setBigDecimal(7, vaccine.getPrice());
-            stmt.setBoolean(8, vaccine.isActive());
-            stmt.setString(9, vaccine.getSideEffects());
-            stmt.setString(10, vaccine.getContraindications());
+            stmt.setBoolean(8, vaccine.isFree());
+            stmt.setBoolean(9, vaccine.isActive());
+            stmt.setString(10, vaccine.getSideEffects());
+            stmt.setString(11, vaccine.getContraindications());
             
             int affected = stmt.executeUpdate();
             
@@ -105,7 +142,7 @@ public class VaccineDAO {
 
     public boolean updateVaccine(Vaccine vaccine) {
         String sql = "UPDATE Vaccines SET VaccineName = ?, Manufacturer = ?, Description = ?, " +
-                     "DiseasesPrevented = ?, DosageSchedule = ?, RecommendedAge = ?, Price = ?, " +
+                     "DiseasesPrevented = ?, DosageSchedule = ?, RecommendedAge = ?, Price = ?, IsFree = ?, " +
                      "SideEffects = ?, Contraindications = ? WHERE VaccineID = ?";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -118,9 +155,10 @@ public class VaccineDAO {
             stmt.setString(5, vaccine.getDosageSchedule());
             stmt.setString(6, vaccine.getRecommendedAge());
             stmt.setBigDecimal(7, vaccine.getPrice());
-            stmt.setString(8, vaccine.getSideEffects());
-            stmt.setString(9, vaccine.getContraindications());
-            stmt.setInt(10, vaccine.getVaccineId());
+            stmt.setBoolean(8, vaccine.isFree());
+            stmt.setString(9, vaccine.getSideEffects());
+            stmt.setString(10, vaccine.getContraindications());
+            stmt.setInt(11, vaccine.getVaccineId());
             
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -153,6 +191,7 @@ public class VaccineDAO {
         vaccine.setDosageSchedule(rs.getString("DosageSchedule"));
         vaccine.setRecommendedAge(rs.getString("RecommendedAge"));
         vaccine.setPrice(rs.getBigDecimal("Price"));
+        vaccine.setFree(rs.getBoolean("IsFree"));
         vaccine.setActive(rs.getBoolean("IsActive"));
         vaccine.setSideEffects(rs.getString("SideEffects"));
         vaccine.setContraindications(rs.getString("Contraindications"));

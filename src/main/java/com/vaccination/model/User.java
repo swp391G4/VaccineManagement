@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class User {
     private int userId;
     private String email;
-    private String passwordHash;
+    private String password;
     private String fullName;
     private String phoneNumber;
     private String role;
@@ -42,12 +42,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFullName() {

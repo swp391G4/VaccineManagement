@@ -9,9 +9,9 @@ public class Appointment {
     private int appointmentId;
     private int childId;
     private int vaccineId;
-    private int centerId;
+    private Integer centerId;  // Nullable for FREE vaccines (parent selects center later)
     private LocalDate appointmentDate;
-    private LocalTime appointmentTime;
+    private LocalTime appointmentTime;  // Nullable for FREE vaccines (parent selects time later)
     private String status;
     private String paymentStatus;
     private BigDecimal paymentAmount;
@@ -28,7 +28,7 @@ public class Appointment {
     public Appointment() {
     }
 
-    public Appointment(int childId, int vaccineId, int centerId, LocalDate appointmentDate, LocalTime appointmentTime) {
+    public Appointment(int childId, int vaccineId, Integer centerId, LocalDate appointmentDate, LocalTime appointmentTime) {
         this.childId = childId;
         this.vaccineId = vaccineId;
         this.centerId = centerId;
@@ -62,11 +62,11 @@ public class Appointment {
         this.vaccineId = vaccineId;
     }
 
-    public int getCenterId() {
+    public Integer getCenterId() {
         return centerId;
     }
 
-    public void setCenterId(int centerId) {
+    public void setCenterId(Integer centerId) {
         this.centerId = centerId;
     }
 

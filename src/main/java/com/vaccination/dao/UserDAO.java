@@ -46,14 +46,14 @@ public class UserDAO {
     }
 
     public boolean createUser(User user) {
-        String sql = "INSERT INTO Users (Email, PasswordHash, FullName, PhoneNumber, Role, IsActive) " +
+        String sql = "INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getPasswordHash());
+            stmt.setString(2, user.getPassword());
             stmt.setString(3, user.getFullName());
             stmt.setString(4, user.getPhoneNumber());
             stmt.setString(5, user.getRole());
@@ -91,13 +91,13 @@ public class UserDAO {
         return false;
     }
 
-    public boolean updatePassword(int userId, String newPasswordHash) {
-        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = GETDATE() WHERE UserID = ?";
+    public boolean updatePassword(int userId, String newPassword) {
+        String sql = "UPDATE Users SET Password = ?, UpdatedAt = GETDATE() WHERE UserID = ?";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, newPasswordHash);
+            stmt.setString(1, newPassword);
             stmt.setInt(2, userId);
             
             return stmt.executeUpdate() > 0;
@@ -176,7 +176,7 @@ public class UserDAO {
         User user = new User();
         user.setUserId(rs.getInt("UserID"));
         user.setEmail(rs.getString("Email"));
-        user.setPasswordHash(rs.getString("PasswordHash"));
+        user.setPassword(rs.getString("Password"));
         user.setFullName(rs.getString("FullName"));
         user.setPhoneNumber(rs.getString("PhoneNumber"));
         user.setRole(rs.getString("Role"));
