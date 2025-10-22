@@ -22,7 +22,7 @@ public class DatabaseConnection {
             if (input == null) {
                 System.out.println("Unable to find database.properties, using defaults");
                 this.driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-                this.url = "jdbc:sqlserver://localhost:1433;databaseName=VaccineManagement";
+                this.url = "jdbc:sqlserver://localhost:1433;databaseName=VaccinationDB";
                 this.username = "sa";
                 this.password = "123456";
             } else {

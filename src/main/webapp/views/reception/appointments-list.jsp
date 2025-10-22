@@ -10,13 +10,28 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="container mt-4">
-    <h2>Appointment Management</h2>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/parent/dashboard">
+                <i class="bi bi-heart-pulse"></i> <h2>Appointment Management</h2>
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="navbar-text text-white me-3">
+                            <i class="bi bi-person-circle"></i> ${sessionScope.userName}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/logout">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div class="mb-3">
-        <a href="<%= request.getContextPath() %>/reception/appointmentsManage" class="btn btn-primary">
-            Manage Payments
-        </a>
-    </div>
 
     <table class="table table-bordered table-hover">
         <thead class="table-light">
@@ -83,5 +98,11 @@
         %>
         </tbody>
     </table>
+        
+        <div class="mb-3">
+        <a href="<%= request.getContextPath() %>/reception/appointmentsManage" class="btn btn-primary">
+            Manage Payments
+        </a>
+    </div>
 </body>
 </html>

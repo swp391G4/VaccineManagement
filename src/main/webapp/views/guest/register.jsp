@@ -1,3 +1,50 @@
+Primary navigation
+Homepage
+Project
+S
+swp391_g4
+
+Pinned
+Issues
+0
+Merge requests
+0
+
+Manage
+
+Plan
+
+Code
+
+Build
+
+Secure
+
+Deploy
+
+Operate
+
+Monitor
+
+Analyze
+
+Settings
+SWP-GR4
+swp391_g4
+swp391_g4
+src
+main
+webapp
+views
+guest
+register.jsp
+register.jsp
+user avatar
+Organize project files and update database schema for NetBeans compatibility
+sonhoang88273 authored 1 week ago
+d8817342
+register.jsp
+3.79 KiB
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <!DOCTYPE html>
@@ -17,7 +64,6 @@
             </a>
         </div>
     </nav>
-
     <div class="container">
         <div class="row justify-content-center mt-5">
             <div class="col-md-6">
@@ -26,13 +72,11 @@
                         <h3 class="text-center mb-4">
                             <i class="bi bi-person-plus"></i> Create Account
                         </h3>
-
                         <c:if test="${not empty error}">
                             <div class="alert alert-danger" role="alert">
                                 <i class="bi bi-exclamation-circle"></i> ${error}
                             </div>
                         </c:if>
-
                         <form method="post" action="${pageContext.request.contextPath}/register">
                             <div class="mb-3">
                                 <label for="fullName" class="form-label">Full Name *</label>
@@ -59,7 +103,6 @@
                                 <button type="submit" class="btn btn-primary">Register</button>
                             </div>
                         </form>
-
                         <div class="text-center mt-3">
                             <p class="mb-0">Already have an account? 
                                 <a href="${pageContext.request.contextPath}/login">Login here</a>
@@ -70,7 +113,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
