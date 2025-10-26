@@ -89,7 +89,7 @@
     </c:forEach>
     
     <div class="container text-center" style="margin: 3rem auto;">
-        <a href="#" class="btn see-more-btn">
+        <a href="${pageContext.request.contextPath}/vaccines" class="btn see-more-btn">
             <i class="bi bi-grid-3x3-gap me-2"></i> Xem tất cả Vaccine
         </a>
     </div>
@@ -140,11 +140,12 @@
                                  alt="${doctor.fullName}"
                                  onerror="this.src='https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop'">
                             <h5>${doctor.fullName}</h5>
+                            <p><i class="bi bi-award me-1"></i> Chuyên khoa Nhi</p>
                         </div>
                     </div>
                 </c:forEach>
             </div>
-            <a href="#" class="btn see-more-btn mt-5">
+            <a href="${pageContext.request.contextPath}/doctors" class="btn see-more-btn mt-5">
                 <i class="bi bi-people me-2"></i> Xem tất cả đội ngũ
             </a>
         </div>
