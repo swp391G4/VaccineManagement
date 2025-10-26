@@ -53,6 +53,16 @@ public class ChildManagementServlet extends HttpServlet {
             } else {
                 response.sendRedirect(request.getContextPath() + "/parent/children");
             }
+        } else if (pathInfo.equals("/edit")) {
+            int childId = Integer.parseInt(request.getParameter("id"));
+            Child child = childDAO.findById(childId);
+            
+            if (child != null && child.getParentId() == user.getUserId()) {
+                request.setAttribute("child", child);
+                request.getRequestDispatcher("/views/parent/child-edit.jsp").forward(request, response);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/parent/children");
+            }
         }
     }
 
@@ -74,7 +84,11 @@ public class ChildManagementServlet extends HttpServlet {
 
         String pathInfo = request.getPathInfo();
         
-        if (pathInfo != null && pathInfo.equals("/add")) {
+        if (pathInfo != null && pathInfo.equals("/update")) {
+            handleUpdateChild(request, response, user);
+        } else if (pathInfo != null && pathInfo.equals("/delete")) {
+            handleDeleteChild(request, response, user);
+        } else if (pathInfo != null && pathInfo.equals("/add")) {
             String fullName = request.getParameter("fullName");
             String dateOfBirth = request.getParameter("dateOfBirth");
             String gender = request.getParameter("gender");
@@ -126,5 +140,84 @@ public class ChildManagementServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/parent/child-add.jsp").forward(request, response);
             }
         }
+    }
+
+    private void handleUpdateChild(HttpServletRequest request, HttpServletResponse response, User user)
+            throws ServletException, IOException {
+        
+        int childId = Integer.parseInt(request.getParameter("childId"));
+        Child existingChild = childDAO.findById(childId);
+
+        if (existingChild == null || existingChild.getParentId() != user.getUserId()) {
+            response.sendRedirect(request.getContextPath() + "/parent/children");
+            return;
+        }
+
+        String fullName = request.getParameter("fullName");
+        String dateOfBirth = request.getParameter("dateOfBirth");
+        String gender = request.getParameter("gender");
+        String bloodType = request.getParameter("bloodType");
+        String medicalHistory = request.getParameter("medicalHistory");
+        String allergies = request.getParameter("allergies");
+        String weightStr = request.getParameter("weight");
+        String heightStr = request.getParameter("height");
+
+        if (fullName == null || dateOfBirth == null || gender == null) {
+            request.setAttribute("error", "Họ tên, ngày sinh và giới tính là bắt buộc");
+            request.setAttribute("child", existingChild);
+            request.getRequestDispatcher("/views/parent/child-edit.jsp").forward(request, response);
+            return;
+        }
+
+        existingChild.setFullName(fullName);
+        existingChild.setDateOfBirth(LocalDate.parse(dateOfBirth));
+        existingChild.setGender(gender);
+        existingChild.setBloodType(bloodType);
+        existingChild.setMedicalHistory(medicalHistory);
+        existingChild.setAllergies(allergies);
+
+        if (weightStr != null && !weightStr.trim().isEmpty()) {
+            existingChild.setWeight(new BigDecimal(weightStr));
+        } else {
+            existingChild.setWeight(null);
+        }
+
+        if (heightStr != null && !heightStr.trim().isEmpty()) {
+            existingChild.setHeight(new BigDecimal(heightStr));
+        } else {
+            existingChild.setHeight(null);
+        }
+
+        if (childDAO.updateChild(existingChild)) {
+            HttpSession session = request.getSession();
+            session.setAttribute("successMessage", "Cập nhật thông tin bé thành công!");
+            response.sendRedirect(request.getContextPath() + "/parent/children/view?id=" + childId);
+        } else {
+            request.setAttribute("error", "Cập nhật thất bại. Vui lòng thử lại!");
+            request.setAttribute("child", existingChild);
+            request.getRequestDispatcher("/views/parent/child-edit.jsp").forward(request, response);
+        }
+    }
+
+    private void handleDeleteChild(HttpServletRequest request, HttpServletResponse response, User user)
+            throws ServletException, IOException {
+        
+        int childId = Integer.parseInt(request.getParameter("childId"));
+        Child child = childDAO.findById(childId);
+
+        if (child == null || child.getParentId() != user.getUserId()) {
+            response.sendRedirect(request.getContextPath() + "/parent/children");
+            return;
+        }
+
+        if (childDAO.deleteChild(childId)) {
+            HttpSession session = request.getSession();
+            session.setAttribute("successMessage", "Đã xóa thông tin bé thành công!");
+        } else {
+            HttpSession session = request.getSession();
+            session.setAttribute("errorMessage", "Xóa thất bại. Vui lòng thử lại!");
+        }
+
+        response.sendRedirect(request.getContextPath() + "/parent/children");
     }
 }

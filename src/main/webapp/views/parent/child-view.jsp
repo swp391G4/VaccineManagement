@@ -45,6 +45,12 @@
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/profile" class="sidebar-menu-link">
+                            <i class="bi bi-person-circle"></i>
+                            <span>Hồ sơ cá nhân</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
                         <a href="${pageContext.request.contextPath}/parent/children" class="sidebar-menu-link active">
                             <i class="bi bi-people-fill"></i>
                             <span>Danh sách con</span>
@@ -227,10 +233,25 @@
 
                         <hr style="margin: 2rem 0; border: none; border-top: 2px solid var(--bg-section);">
 
+                        <c:if test="${not empty sessionScope.successMessage}">
+                            <div class="alert-modern fade-in-up" style="background: linear-gradient(135deg, rgba(72, 199, 116, 0.1) 0%, rgba(92, 200, 190, 0.1) 100%); border-left: 4px solid #48C774; margin-bottom: 1.5rem;">
+                                <i class="bi bi-check-circle-fill" style="color: #48C774; font-size: 1.5rem;"></i>
+                                <div>
+                                    <strong>Thành công!</strong><br>
+                                    ${sessionScope.successMessage}
+                                </div>
+                            </div>
+                            <c:remove var="successMessage" scope="session" />
+                        </c:if>
+
                         <!-- Action Buttons -->
                         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                             <a href="${pageContext.request.contextPath}/parent/children" class="btn-modern btn-outline-modern">
                                 <i class="bi bi-arrow-left"></i> Quay lại
+                            </a>
+                            <a href="${pageContext.request.contextPath}/parent/children/edit?id=${child.childId}" 
+                               class="btn-modern" style="background: linear-gradient(135deg, #FFB84D 0%, #FF8C42 100%); color: white;">
+                                <i class="bi bi-pencil-square"></i> Chỉnh sửa
                             </a>
                             <a href="${pageContext.request.contextPath}/parent/recommended-vaccines?childId=${child.childId}" 
                                class="btn-modern btn-info-modern">

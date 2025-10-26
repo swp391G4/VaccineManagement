@@ -45,6 +45,12 @@
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/profile" class="sidebar-menu-link">
+                            <i class="bi bi-person-circle"></i>
+                            <span>Hồ sơ cá nhân</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
                         <a href="${pageContext.request.contextPath}/parent/children" class="sidebar-menu-link active">
                             <i class="bi bi-people-fill"></i>
                             <span>Danh sách con</span>
@@ -87,25 +93,26 @@
                     </div>
                 </div>
 
-                <!-- SUCCESS/ERROR MESSAGES -->
-                <c:if test="${not empty error}">
+                <c:if test="${not empty sessionScope.errorMessage}">
                     <div class="alert-modern alert-info-modern fade-in-up" style="background: linear-gradient(135deg, rgba(241, 70, 104, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%); border-left-color: #F14668;">
                         <i class="bi bi-exclamation-triangle-fill" style="color: #F14668;"></i>
                         <div>
                             <strong>Lỗi!</strong><br>
-                            ${error}
+                            ${sessionScope.errorMessage}
                         </div>
                     </div>
+                    <c:remove var="errorMessage" scope="session" />
                 </c:if>
 
-                <c:if test="${not empty success}">
+                <c:if test="${not empty sessionScope.successMessage}">
                     <div class="alert-modern fade-in-up" style="background: linear-gradient(135deg, rgba(72, 199, 116, 0.1) 0%, rgba(92, 200, 190, 0.1) 100%); border-left: 4px solid #48C774;">
                         <i class="bi bi-check-circle-fill" style="color: #48C774; font-size: 1.5rem;"></i>
                         <div>
                             <strong>Thành công!</strong><br>
-                            ${success}
+                            ${sessionScope.successMessage}
                         </div>
                     </div>
+                    <c:remove var="successMessage" scope="session" />
                 </c:if>
 
                 <!-- CHILDREN LIST -->
@@ -204,21 +211,21 @@
                                                     <td>
                                                         <div class="action-buttons">
                                                             <a href="${pageContext.request.contextPath}/parent/children/view?id=${child.childId}" 
-                                                               class="btn-modern btn-info-modern btn-sm-modern">
-                                                                <i class="bi bi-eye-fill"></i> Xem
+                                                               class="btn-modern btn-info-modern btn-sm-modern" title="Xem chi tiết">
+                                                                <i class="bi bi-eye-fill"></i>
                                                             </a>
-                                                            <a href="${pageContext.request.contextPath}/parent/recommended-vaccines?childId=${child.childId}" 
-                                                               class="btn-modern btn-outline-modern btn-sm-modern" style="border-color: #FFB84D; color: #FFB84D;">
-                                                                <i class="bi bi-clipboard2-pulse"></i>
+                                                            <a href="${pageContext.request.contextPath}/parent/children/edit?id=${child.childId}" 
+                                                               class="btn-modern btn-outline-modern btn-sm-modern" style="border-color: #FFB84D; color: #FFB84D;" title="Chỉnh sửa">
+                                                                <i class="bi bi-pencil-square"></i>
                                                             </a>
                                                             <a href="${pageContext.request.contextPath}/parent/booking/step1?childId=${child.childId}" 
-                                                               class="btn-modern btn-primary-modern btn-sm-modern">
+                                                               class="btn-modern btn-primary-modern btn-sm-modern" title="Đặt lịch">
                                                                 <i class="bi bi-calendar-plus"></i>
                                                             </a>
-                                                            <a href="${pageContext.request.contextPath}/parent/vaccination-history/${child.childId}" 
-                                                               class="btn-modern btn-success-modern btn-sm-modern">
-                                                                <i class="bi bi-clipboard-pulse"></i>
-                                                            </a>
+                                                            <button onclick="confirmDelete(${child.childId}, '${child.fullName}')" 
+                                                                    class="btn-modern btn-sm-modern" style="background: linear-gradient(135deg, #F14668 0%, #FF6B9D 100%); color: white; border: none;" title="Xóa">
+                                                                <i class="bi bi-trash-fill"></i>
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -233,5 +240,24 @@
             </main>
         </div>
     </div>
+
+    <script>
+        function confirmDelete(childId, childName) {
+            if (confirm('Bạn có chắc chắn muốn xóa hồ sơ của "' + childName + '"?\n\nLưu ý: Hành động này sẽ đánh dấu hồ sơ là không hoạt động.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '${pageContext.request.contextPath}/parent/children/delete';
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'childId';
+                input.value = childId;
+                
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>

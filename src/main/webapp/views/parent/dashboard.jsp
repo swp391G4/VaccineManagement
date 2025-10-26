@@ -45,6 +45,12 @@
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/profile" class="sidebar-menu-link">
+                            <i class="bi bi-person-circle"></i>
+                            <span>Hồ sơ cá nhân</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
                         <a href="${pageContext.request.contextPath}/parent/children" class="sidebar-menu-link">
                             <i class="bi bi-people-fill"></i>
                             <span>Danh sách con</span>
