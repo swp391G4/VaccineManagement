@@ -2,377 +2,360 @@
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment Details - Vaccination System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Chi tiết lịch hẹn - Hệ thống Tiêm chủng</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
     <style>
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 1rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .status-PENDING { background-color: #ffc107; color: #000; }
-        .status-CONFIRMED { background-color: #198754; color: #fff; }
-        .status-COMPLETED { background-color: #0dcaf0; color: #000; }
-        .status-CANCELLED { background-color: #dc3545; color: #fff; }
-        .status-REJECTED { background-color: #dc3545; color: #fff; }
-        
         .info-section {
-            background-color: #f8f9fa;
-            border-radius: 0.375rem;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, rgba(92, 200, 190, 0.05) 100%);
+            border-radius: var(--border-radius-lg);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary-color);
         }
-        
-        .info-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 0.25rem;
-        }
-        
-        .info-value {
-            font-size: 1.1rem;
-            color: #212529;
-        }
-        
-        .section-icon {
-            font-size: 1.5rem;
-            margin-right: 0.5rem;
-        }
-        
-        .payment-amount {
-            font-size: 1.5rem;
+        .info-section h6 {
+            color: var(--primary-color);
             font-weight: 700;
-            color: #198754;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .info-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .status-badge-large {
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius-xl);
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/parent/dashboard">
-                <i class="bi bi-heart-pulse"></i> Vaccination System
-            </a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <span class="navbar-text text-white me-3">
-                            <i class="bi bi-person-circle"></i> ${sessionScope.userName}
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/logout">
-                            <i class="bi bi-box-arrow-right"></i> Logout
-                        </a>
-                    </li>
-                </ul>
+    <nav class="dashboard-navbar">
+        <div class="dashboard-container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="${pageContext.request.contextPath}/parent/dashboard" class="navbar-brand-custom">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                    <span>Vaccine For Kids</span>
+                </a>
+                <div style="display: flex; align-items: center;">
+                    <div class="navbar-user-info">
+                        <i class="bi bi-person-circle"></i>
+                        <span>${sessionScope.userName}</span>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Đăng xuất
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4 mb-5">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/parent/dashboard">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/parent/appointments">Appointments</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Appointment Details</li>
-            </ol>
-        </nav>
+    <div class="dashboard-container">
+        <div class="dashboard-row">
+            <aside class="sidebar slide-in-left">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/dashboard" class="sidebar-menu-link">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/children" class="sidebar-menu-link">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Danh sách con</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/booking/step1" class="sidebar-menu-link">
+                            <i class="bi bi-calendar-plus"></i>
+                            <span>Đặt lịch tiêm</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/appointments" class="sidebar-menu-link active">
+                            <i class="bi bi-calendar-check"></i>
+                            <span>Lịch hẹn của tôi</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="${pageContext.request.contextPath}/parent/vaccination-history" class="sidebar-menu-link">
+                            <i class="bi bi-clipboard-pulse"></i>
+                            <span>Lịch sử tiêm chủng</span>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
 
-        <c:if test="${not empty sessionScope.success}">
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle"></i> ${sessionScope.success}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <c:remove var="success" scope="session"/>
-        </c:if>
-
-        <c:if test="${not empty sessionScope.error}">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-circle"></i> ${sessionScope.error}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <c:remove var="error" scope="session"/>
-        </c:if>
-
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">
-                        <i class="bi bi-calendar-check"></i> Appointment Details
-                    </h4>
-                    <div>
-                        <span class="badge bg-light text-dark">ID: #${appointment.appointmentId}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <span class="status-badge status-${appointment.status}">
-                        ${appointment.status}
-                    </span>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0">
-                                    <i class="bi bi-person-fill section-icon text-primary"></i>
-                                    Child Information
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="info-label">Full Name</div>
-                                    <div class="info-value">${appointment.child.fullName}</div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="info-label">Date of Birth</div>
-                                    <div class="info-value">
-                                        <i class="bi bi-calendar3"></i> ${appointment.child.dateOfBirth}
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="info-label">Gender</div>
-                                    <div class="info-value">
-                                        <i class="bi bi-gender-ambiguous"></i> ${appointment.child.gender}
-                                    </div>
-                                </div>
-                                <c:if test="${not empty appointment.child.bloodType}">
-                                    <div class="mb-0">
-                                        <div class="info-label">Blood Type</div>
-                                        <div class="info-value">
-                                            <i class="bi bi-droplet-fill text-danger"></i> ${appointment.child.bloodType}
-                                        </div>
-                                    </div>
-                                </c:if>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0">
-                                    <i class="bi bi-shield-fill-check section-icon text-success"></i>
-                                    Vaccine Information
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="info-label">Vaccine Name</div>
-                                    <div class="info-value">${appointment.vaccine.vaccineName}</div>
-                                </div>
-                                <c:if test="${not empty appointment.vaccine.manufacturer}">
-                                    <div class="mb-3">
-                                        <div class="info-label">Manufacturer</div>
-                                        <div class="info-value">
-                                            <i class="bi bi-building"></i> ${appointment.vaccine.manufacturer}
-                                        </div>
-                                    </div>
-                                </c:if>
-                                <c:if test="${not empty appointment.vaccine.diseasesPrevented}">
-                                    <div class="mb-3">
-                                        <div class="info-label">Diseases Prevented</div>
-                                        <div class="info-value">${appointment.vaccine.diseasesPrevented}</div>
-                                    </div>
-                                </c:if>
-                                <div class="mb-0">
-                                    <div class="info-label">Price</div>
-                                    <div class="payment-amount">
-                                        <fmt:formatNumber value="${appointment.vaccine.price}" type="currency" currencySymbol="$"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <main class="dashboard-main">
+                <div style="margin-bottom: 1.5rem;">
+                    <nav aria-label="breadcrumb">
+                        <ol style="display: flex; list-style: none; padding: 0; margin: 0; gap: 0.5rem; font-size: 0.9rem;">
+                            <li><a href="${pageContext.request.contextPath}/parent/dashboard" style="color: var(--primary-color);">Dashboard</a></li>
+                            <li style="color: var(--text-light);">/</li>
+                            <li><a href="${pageContext.request.contextPath}/parent/appointments" style="color: var(--primary-color);">Lịch hẹn</a></li>
+                            <li style="color: var(--text-light);">/</li>
+                            <li style="color: var(--text-medium);">Chi tiết</li>
+                        </ol>
+                    </nav>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0">
-                                    <i class="bi bi-hospital section-icon text-info"></i>
-                                    Center Information
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="info-label">Center Name</div>
-                                    <div class="info-value">${appointment.center.centerName}</div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="info-label">Address</div>
-                                    <div class="info-value">
-                                        <i class="bi bi-geo-alt-fill"></i> 
-                                        ${appointment.center.address}
-                                        <c:if test="${not empty appointment.center.city}">
-                                            , ${appointment.center.city}
-                                        </c:if>
-                                    </div>
-                                </div>
-                                <c:if test="${not empty appointment.center.phoneNumber}">
-                                    <div class="mb-3">
-                                        <div class="info-label">Phone Number</div>
-                                        <div class="info-value">
-                                            <i class="bi bi-telephone-fill"></i> 
-                                            <a href="tel:${appointment.center.phoneNumber}">${appointment.center.phoneNumber}</a>
-                                        </div>
-                                    </div>
-                                </c:if>
-                                <c:if test="${not empty appointment.center.operatingHours}">
-                                    <div class="mb-0">
-                                        <div class="info-label">Operating Hours</div>
-                                        <div class="info-value">
-                                            <i class="bi bi-clock-fill"></i> ${appointment.center.operatingHours}
-                                        </div>
-                                    </div>
-                                </c:if>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0">
-                                    <i class="bi bi-calendar-event section-icon text-warning"></i>
-                                    Appointment Schedule
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="info-label">Date</div>
-                                    <div class="info-value">
-                                        <i class="bi bi-calendar3"></i> ${appointment.appointmentDate}
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="info-label">Time</div>
-                                    <div class="info-value">
-                                        <i class="bi bi-clock"></i> ${appointment.appointmentTime}
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="info-label">Payment Status</div>
-                                    <div class="info-value">
-                                        <c:choose>
-                                            <c:when test="${appointment.paymentStatus == 'PAID'}">
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle-fill"></i> PAID
-                                                </span>
-                                            </c:when>
-                                            <c:when test="${appointment.paymentStatus == 'PENDING'}">
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="bi bi-clock-fill"></i> PENDING
-                                                </span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="badge bg-danger">
-                                                    <i class="bi bi-x-circle-fill"></i> UNPAID
-                                                </span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                </div>
-                                <c:if test="${not empty appointment.paymentAmount}">
-                                    <div class="mb-0">
-                                        <div class="info-label">Payment Amount</div>
-                                        <div class="payment-amount">
-                                            <fmt:formatNumber value="${appointment.paymentAmount}" type="currency" currencySymbol="$"/>
-                                        </div>
-                                    </div>
-                                </c:if>
-                            </div>
-                        </div>
-                    </div>
+                <div class="page-header fade-in-up">
+                    <h1 class="page-title">Chi tiết lịch hẹn</h1>
+                    <p class="page-subtitle">Thông tin đầy đủ về lịch hẹn tiêm chủng</p>
                 </div>
 
-                <c:if test="${not empty appointment.notes}">
-                    <div class="card mb-3">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0">
-                                <i class="bi bi-journal-text section-icon"></i>
-                                Notes
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-0">${appointment.notes}</p>
+                <c:if test="${not empty sessionScope.success}">
+                    <div class="alert-modern fade-in-up" style="background: linear-gradient(135deg, rgba(72, 199, 116, 0.1) 0%, rgba(92, 200, 190, 0.1) 100%); border-left: 4px solid #48C774;">
+                        <i class="bi bi-check-circle-fill" style="color: #48C774; font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>Thành công!</strong><br>
+                            ${sessionScope.success}
                         </div>
                     </div>
+                    <c:remove var="success" scope="session"/>
                 </c:if>
 
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <small class="text-muted">
-                                    <i class="bi bi-clock-history"></i> 
-                                    Created: ${appointment.createdAt}
-                                </small>
+                <c:if test="${not empty sessionScope.error}">
+                    <div class="alert-modern fade-in-up" style="background: linear-gradient(135deg, rgba(241, 70, 104, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%); border-left: 4px solid var(--danger-color);">
+                        <i class="bi bi-exclamation-circle-fill" style="color: var(--danger-color); font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>Lỗi!</strong><br>
+                            ${sessionScope.error}
+                        </div>
+                    </div>
+                    <c:remove var="error" scope="session"/>
+                </c:if>
+
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; margin-bottom: 2rem;">
+                    <div class="content-card fade-in-up">
+                        <div class="content-card-header">
+                            <h3 class="content-card-title">
+                                <i class="bi bi-info-circle-fill"></i>
+                                Thông tin lịch hẹn
+                            </h3>
+                        </div>
+                        <div class="content-card-body">
+                            <div class="info-grid" style="margin-bottom: 1.5rem;">
+                                <div class="info-item">
+                                    <span class="info-label"><i class="bi bi-hash"></i> Mã lịch hẹn</span>
+                                    <span class="info-value">#${appointment.appointmentId}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="bi bi-calendar3"></i> Ngày hẹn</span>
+                                    <span class="info-value">
+                                        <${appointment.appointmentDate}
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="bi bi-clock"></i> Giờ hẹn</span>
+                                    <span class="info-value">
+                                        ${appointment.appointmentTime}
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label"><i class="bi bi-flag-fill"></i> Trạng thái</span>
+                                    <c:choose>
+                                        <c:when test="${appointment.status == 'PENDING'}">
+                                            <span class="status-badge-large" style="background: linear-gradient(135deg, rgba(255, 184, 77, 0.2) 0%, rgba(255, 107, 157, 0.2) 100%); color: #FFB84D;">
+                                                <i class="bi bi-hourglass-split"></i> Chờ xác nhận
+                                            </span>
+                                        </c:when>
+                                        <c:when test="${appointment.status == 'CONFIRMED'}">
+                                            <span class="status-badge-large" style="background: linear-gradient(135deg, rgba(72, 199, 116, 0.2) 0%, rgba(92, 200, 190, 0.2) 100%); color: #48C774;">
+                                                <i class="bi bi-check-circle-fill"></i> Đã xác nhận
+                                            </span>
+                                        </c:when>
+                                        <c:when test="${appointment.status == 'COMPLETED'}">
+                                            <span class="status-badge-large" style="background: linear-gradient(135deg, rgba(58, 191, 248, 0.2) 0%, rgba(74, 144, 226, 0.2) 100%); color: #3ABFF8;">
+                                                <i class="bi bi-check-all"></i> Hoàn thành
+                                            </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="status-badge-large" style="background: linear-gradient(135deg, rgba(241, 70, 104, 0.2) 0%, rgba(255, 107, 157, 0.2) 100%); color: #F14668;">
+                                                <i class="bi bi-x-circle-fill"></i> Đã hủy
+                                            </span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
                             </div>
-                            <c:if test="${not empty appointment.updatedAt}">
-                                <div class="col-md-6 text-md-end">
-                                    <small class="text-muted">
-                                        <i class="bi bi-arrow-clockwise"></i> 
-                                        Last Updated: ${appointment.updatedAt}
-                                    </small>
+
+                            <div class="info-section">
+                                <h6><i class="bi bi-person-fill"></i> Thông tin trẻ em</h6>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">Họ và tên</span>
+                                        <span class="info-value">${appointment.child.fullName}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Ngày sinh</span>
+                                        <span class="info-value">${appointment.child.dateOfBirth}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Giới tính</span>
+                                        <span class="info-value">${appointment.child.gender != null ? appointment.child.gender : 'N/A'}</span>
+                                    </div>
+                                    <c:if test="${not empty appointment.child.bloodType}">
+                                        <div class="info-item">
+                                            <span class="info-label">Nhóm máu</span>
+                                            <span class="info-value">${appointment.child.bloodType}</span>
+                                        </div>
+                                    </c:if>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <h6><i class="bi bi-shield-fill-check"></i> Thông tin vaccine</h6>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">Tên vaccine</span>
+                                        <span class="info-value" style="color: var(--primary-color);">${appointment.vaccine.vaccineName}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Nhà sản xuất</span>
+                                        <span class="info-value">${appointment.vaccine.manufacturer}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Phòng bệnh</span>
+                                        <span class="info-value">${appointment.vaccine.diseasesPrevented}</span>
+                                    </div>
+                                    <c:if test="${appointment.vaccine.free}">
+                                        <div class="info-item">
+                                            <span class="info-label">Phân loại</span>
+                                            <span style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 1rem; background: linear-gradient(135deg, rgba(72, 199, 116, 0.2) 0%, rgba(92, 200, 190, 0.2) 100%); border-radius: 20px; color: #48C774; font-weight: 600;">
+                                                <i class="bi bi-gift-fill"></i> Miễn phí
+                                            </span>
+                                        </div>
+                                    </c:if>
+                                </div>
+                            </div>
+
+                            <c:if test="${not empty appointment.notes}">
+                                <div class="info-section">
+                                    <h6><i class="bi bi-sticky-fill"></i> Ghi chú</h6>
+                                    <div style="background: white; padding: 1rem; border-radius: var(--border-radius-md); border: 1px solid var(--bg-section);">
+                                        ${appointment.notes}
+                                    </div>
                                 </div>
                             </c:if>
                         </div>
                     </div>
-                </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <a href="${pageContext.request.contextPath}/parent/appointments" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Back to List
-                    </a>
-                    
-                    <c:if test="${appointment.status == 'PENDING'}">
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                            <i class="bi bi-x-circle"></i> Cancel Appointment
-                        </button>
-                    </c:if>
+                    <div style="width: 350px;">
+                        <div class="content-card fade-in-up">
+                            <div class="content-card-header">
+                                <h3 class="content-card-title">
+                                    <i class="bi bi-gear-fill"></i>
+                                    Thao tác
+                                </h3>
+                            </div>
+                            <div class="content-card-body">
+                                <c:choose>
+                                    <c:when test="${appointment.status == 'PENDING' || appointment.status == 'CONFIRMED'}">
+                                        <button type="button" class="btn-modern btn-danger w-100" style="width: 100%; margin-bottom: 1rem;" onclick="document.getElementById('cancelModal').style.display='flex'">
+                                            <i class="bi bi-x-circle"></i> Hủy lịch hẹn
+                                        </button>
+                                        <div class="alert-modern alert-info-modern" style="margin: 0;">
+                                            <i class="bi bi-info-circle-fill"></i>
+                                            <div>
+                                                <strong>Lưu ý</strong><br>
+                                                Vui lòng đến trước 15 phút so với giờ hẹn.
+                                            </div>
+                                        </div>
+                                    </c:when>
+                                    <c:when test="${appointment.status == 'COMPLETED'}">
+                                        <div class="alert-modern" style="background: linear-gradient(135deg, rgba(72, 199, 116, 0.1) 0%, rgba(92, 200, 190, 0.1) 100%); border-left: 4px solid #48C774; margin: 0;">
+                                            <i class="bi bi-check-circle-fill" style="color: #48C774; font-size: 1.5rem;"></i>
+                                            <div>
+                                                <strong>Hoàn thành</strong><br>
+                                                Lịch hẹn này đã được hoàn thành.
+                                            </div>
+                                        </div>
+                                    </c:when>
+                                    <c:when test="${appointment.status == 'CANCELLED'}">
+                                        <div class="alert-modern" style="background: linear-gradient(135deg, rgba(120, 144, 156, 0.1) 0%, rgba(120, 144, 156, 0.1) 100%); border-left: 4px solid var(--text-medium); margin: 0;">
+                                            <i class="bi bi-info-circle-fill" style="color: var(--text-medium); font-size: 1.5rem;"></i>
+                                            <div>
+                                                <strong>Đã hủy</strong><br>
+                                                Lịch hẹn này đã được hủy.
+                                            </div>
+                                        </div>
+                                    </c:when>
+                                </c:choose>
+                            </div>
+                        </div>
+
+                        <div class="content-card fade-in-up" style="margin-top: 1.5rem;">
+                            <div class="content-card-header">
+                                <h3 class="content-card-title">
+                                    <i class="bi bi-link-45deg"></i>
+                                    Liên kết nhanh
+                                </h3>
+                            </div>
+                            <div class="content-card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <a href="${pageContext.request.contextPath}/parent/appointments" class="btn-modern btn-outline-modern" style="width: 100%;">
+                                    <i class="bi bi-calendar-check"></i> Tất cả lịch hẹn
+                                </a>
+                                <a href="${pageContext.request.contextPath}/parent/booking/step1" class="btn-modern btn-primary-modern" style="width: 100%;">
+                                    <i class="bi bi-calendar-plus"></i> Đặt lịch mới
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 
-    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="cancelModalLabel">
-                        <i class="bi bi-exclamation-triangle"></i> Cancel Appointment
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to cancel this appointment?</p>
-                    <p class="text-muted mb-0">This action cannot be undone.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x"></i> No, Keep It
+    <div id="cancelModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; border-radius: var(--border-radius-lg); max-width: 500px; width: 90%; padding: 2rem; box-shadow: var(--shadow-xl);">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--warning-color);"></i>
+                <h5 style="margin: 0; color: var(--text-dark);">Hủy lịch hẹn</h5>
+            </div>
+            <p style="color: var(--text-medium); margin-bottom: 1rem;">Bạn có chắc chắn muốn hủy lịch hẹn này không?</p>
+            <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1.5rem;">Hành động này không thể hoàn tác. Bạn sẽ cần đặt lịch mới nếu muốn tiêm chủng.</p>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" class="btn-modern btn-outline-modern" onclick="document.getElementById('cancelModal').style.display='none'">
+                    <i class="bi bi-x"></i> Không, giữ lại
+                </button>
+                <form method="post" action="${pageContext.request.contextPath}/parent/appointments/${appointment.appointmentId}/cancel" style="display: inline;">
+                    <button type="submit" class="btn-modern" style="background: var(--danger-color); color: white;">
+                        <i class="bi bi-check"></i> Có, hủy lịch
                     </button>
-                    <form method="post" action="${pageContext.request.contextPath}/parent/appointments/${appointment.appointmentId}/cancel">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-check"></i> Yes, Cancel Appointment
-                        </button>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

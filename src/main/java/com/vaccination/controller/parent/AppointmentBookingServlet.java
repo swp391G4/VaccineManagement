@@ -96,6 +96,7 @@ public class AppointmentBookingServlet extends HttpServlet {
         String vaccineIdStr = request.getParameter("vaccineId");
         String dateStr = request.getParameter("date");
         String centerIdStr = request.getParameter("centerId");
+        String timeStr = request.getParameter("time");
         
         if (childIdStr == null || vaccineIdStr == null) {
             response.sendRedirect(request.getContextPath() + "/parent/booking/step1");
@@ -123,12 +124,17 @@ public class AppointmentBookingServlet extends HttpServlet {
             availableSlots = scheduleDAO.getAvailableTimeSlots(centerId, dayOfWeek, selectedDate);
         }
         
+        LocalDate minDate = LocalDate.now();
+        String minDateStr = minDate.toString();
+        
         request.setAttribute("child", child);
         request.setAttribute("vaccine", vaccine);
         request.setAttribute("centers", centers);
         request.setAttribute("selectedDate", dateStr);
         request.setAttribute("selectedCenterId", centerIdStr);
+        request.setAttribute("selectedTimeSlot", timeStr);
         request.setAttribute("availableSlots", availableSlots);
+        request.setAttribute("minDate", minDateStr);
         
         request.getRequestDispatcher("/views/parent/booking-step2.jsp").forward(request, response);
     }
