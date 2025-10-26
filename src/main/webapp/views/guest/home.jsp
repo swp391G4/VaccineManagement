@@ -1,128 +1,156 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Child Vaccination Management System</title>
+    <title>Vaccine For Kids - Hệ thống Quản lý Tiêm chủng Thông minh</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/home.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/">
-                <i class="bi bi-heart-pulse"></i> Vaccination System
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/">Home</a>
-                    </li>
-                    <c:choose>
-                        <c:when test="${sessionScope.user != null}">
-                            <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/logout">
-                                    <i class="bi bi-box-arrow-right"></i> Logout
-                                </a>
-                            </li>
-                        </c:when>
-                        <c:otherwise>
-                            <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/register">Register</a>
-                            </li>
-                        </c:otherwise>
-                    </c:choose>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-5">
-        <div class="jumbotron text-center bg-primary text-white p-5 rounded">
-            <h1 class="display-4">Child Vaccination Management System</h1>
-            <p class="lead">Protecting children's health through comprehensive vaccination management</p>
-            <hr class="my-4 bg-white">
-            <p>Manage vaccination schedules, book appointments, and track immunization records</p>
+    
+    <jsp:include page="/views/includes/header.jsp" />
+    
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1>Vaccine For Kids</h1>
+            <p class="lead">Hệ thống quản lý tiêm chủng thông minh cho mọi trẻ em. Giúp bạn theo dõi lịch trình, đặt hẹn và lưu trữ hồ sơ tiêm chủng dễ dàng.</p>
             <c:choose>
                 <c:when test="${sessionScope.user == null}">
-                    <a class="btn btn-light btn-lg" href="${pageContext.request.contextPath}/register">Get Started</a>
+                    <a class="btn btn-primary btn-lg" href="${pageContext.request.contextPath}/register">
+                        Đặt lịch tiêm ngay
+                    </a>
                 </c:when>
                 <c:otherwise>
-                    <a class="btn btn-light btn-lg" href="${pageContext.request.contextPath}/parent/dashboard">My Dashboard</a>
+                    <a class="btn btn-light btn-lg" href="${pageContext.request.contextPath}/parent/booking/step1">
+                        Đặt lịch tiêm ngay
+                    </a>
                 </c:otherwise>
             </c:choose>
         </div>
-
-        <div class="row mt-5">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
-                        <h5 class="card-title mt-3">Safe & Reliable</h5>
-                        <p class="card-text">WHO-approved vaccines administered by certified medical professionals</p>
+    </div>
+    
+    <c:forEach items="${vaccines}" var="vaccine" varStatus="loop" begin="0" end="1">
+        <div class="content-section">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-md-6 ${loop.index % 2 == 1 ? 'order-md-2' : ''}">
+                        <h2>${vaccine.vaccineName}</h2>
+                        <p>
+                            <c:choose>
+                                <c:when test="${not empty vaccine.description}">
+                                    ${vaccine.description}
+                                </c:when>
+                                <c:otherwise>
+                                    Vaccine giúp phòng ngừa các bệnh: ${vaccine.diseasesPrevented}. 
+                                    Đây là một trong những loại vaccine quan trọng để bảo vệ sức khỏe của trẻ em.
+                                </c:otherwise>
+                            </c:choose>
+                            <c:if test="${not empty vaccine.recommendedAge}">
+                                <br><small class="text-muted">
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    Độ tuổi khuyến nghị: ${vaccine.recommendedAge}
+                                </small>
+                            </c:if>
+                        </p>
+                        <a href="#" class="btn btn-custom-outline">
+                            <i class="bi bi-info-circle me-1"></i> Xem chi tiết
+                        </a>
+                        <c:choose>
+                            <c:when test="${sessionScope.user != null}">
+                                <a href="${pageContext.request.contextPath}/parent/booking/step1?vaccineId=${vaccine.vaccineId}" 
+                                   class="btn btn-custom-outline">
+                                    <i class="bi bi-calendar-plus me-1"></i> Đặt lịch ngay
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/login" class="btn btn-custom-outline">
+                                    <i class="bi bi-calendar-plus me-1"></i> Đặt lịch ngay
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-calendar-check text-success" style="font-size: 3rem;"></i>
-                        <h5 class="card-title mt-3">Easy Scheduling</h5>
-                        <p class="card-text">Book appointments online at your convenience</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-file-medical text-info" style="font-size: 3rem;"></i>
-                        <h5 class="card-title mt-3">Digital Records</h5>
-                        <p class="card-text">Access vaccination history anytime, anywhere</p>
+                    <div class="col-md-6 ${loop.index % 2 == 1 ? 'order-md-1' : ''}">
+                        <img src="${pageContext.request.contextPath}/images/vaccine-image-${loop.index + 1}.jpg" 
+                             alt="${vaccine.vaccineName}" 
+                             class="content-image"
+                             onerror="this.src='https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=800&auto=format&fit=crop'">
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <h3>Available Vaccines</h3>
-                <div class="list-group">
-                    <c:forEach items="${vaccines}" var="vaccine" begin="0" end="4">
-                        <div class="list-group-item">
-                            <h6 class="mb-1">${vaccine.vaccineName}</h6>
-                            <small class="text-muted">${vaccine.diseasesPrevented}</small>
+    </c:forEach>
+    
+    <div class="container text-center" style="margin: 3rem auto;">
+        <a href="#" class="btn see-more-btn">
+            <i class="bi bi-grid-3x3-gap me-2"></i> Xem tất cả Vaccine
+        </a>
+    </div>
+    
+    <div class="icon-features-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="icon-feature">
+                        <div class="icon-feature-icon">
+                            <i class="bi bi-calendar-check"></i>
                         </div>
-                    </c:forEach>
+                        <h5>Xem lịch tiêm</h5>
+                        <p>Dễ dàng theo dõi lịch tiêm chủng được khuyến nghị cho bé. Nhận thông báo nhắc nhở tự động.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <h3>Vaccination Centers</h3>
-                <div class="list-group">
-                    <c:forEach items="${centers}" var="center" begin="0" end="4">
-                        <div class="list-group-item">
-                            <h6 class="mb-1">${center.centerName}</h6>
-                            <small class="text-muted">${center.address}, ${center.city}</small>
+                <div class="col-md-4">
+                    <div class="icon-feature">
+                        <div class="icon-feature-icon">
+                            <i class="bi bi-clock-history"></i>
                         </div>
-                    </c:forEach>
+                        <h5>Đặt lịch tiêm</h5>
+                        <p>Nhanh chóng đặt lịch hẹn tại các trung tâm y tế uy tín. Tiết kiệm thời gian chờ đợi.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="icon-feature">
+                        <div class="icon-feature-icon">
+                            <i class="bi bi-journal-medical"></i>
+                        </div>
+                        <h5>Sổ tiêm của tôi</h5>
+                        <p>Lưu trữ và truy cập lịch sử tiêm chủng của con bạn mọi lúc mọi nơi, an toàn và bảo mật.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <footer class="bg-light mt-5 py-3">
-        <div class="container text-center">
-            <p class="text-muted mb-0">&copy; 2025 Child Vaccination Management System. All rights reserved.</p>
+    
+    <div class="our-doctors-section">
+        <div class="container">
+            <h2>Đội ngũ chuyên viên <span class="text-gradient">y tế</span></h2>
+            <p class="lead">Gặp gỡ các bác sĩ và chuyên gia y tế tận tâm của chúng tôi, sẵn sàng chăm sóc sức khỏe cho con bạn.</p>
+            <div class="row g-4 justify-content-center">
+                <c:forEach items="${doctors}" var="doctor" begin="0" end="3">
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="doctor-card">
+                            <img src="${pageContext.request.contextPath}/images/doctor-placeholder.png" 
+                                 alt="${doctor.fullName}"
+                                 onerror="this.src='https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop'">
+                            <h5>${doctor.fullName}</h5>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
+            <a href="#" class="btn see-more-btn mt-5">
+                <i class="bi bi-people me-2"></i> Xem tất cả đội ngũ
+            </a>
         </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+    
+    <jsp:include page="/views/includes/footer.jsp" />
+    
 </body>
 </html>
