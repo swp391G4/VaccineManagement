@@ -13,22 +13,25 @@ public class Vaccine {
     private String recommendedAge;
     private BigDecimal price;
     private boolean isFree;
-    private boolean isActive;
+    private boolean isActive; // Sửa tên biến
     private String sideEffects;
     private String contraindications;
     private LocalDateTime createdAt;
+    private String imageUrl; // <<<===== THÊM TRƯỜNG NÀY
 
     public Vaccine() {
     }
 
+    // Constructor có thể giữ nguyên hoặc cập nhật thêm imageUrl nếu cần
     public Vaccine(int vaccineId, String vaccineName, String manufacturer, BigDecimal price) {
         this.vaccineId = vaccineId;
         this.vaccineName = vaccineName;
         this.manufacturer = manufacturer;
         this.price = price;
-        this.isActive = true;
+        this.isActive = true; // Sửa tên biến
     }
 
+    // --- Getters and Setters cũ (Giữ nguyên) ---
     public int getVaccineId() {
         return vaccineId;
     }
@@ -97,16 +100,17 @@ public class Vaccine {
         return isFree;
     }
 
+    // Sửa tên phương thức setter cho boolean isFree
     public void setFree(boolean free) {
         isFree = free;
     }
 
     public boolean isActive() {
-        return isActive;
+        return isActive; // Sửa tên biến
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        isActive = active; // Sửa tên biến
     }
 
     public String getSideEffects() {
@@ -133,6 +137,16 @@ public class Vaccine {
         this.createdAt = createdAt;
     }
 
+    // --- THÊM GETTER VÀ SETTER MỚI CHO imageUrl ---
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+    // --- KẾT THÚC PHẦN THÊM MỚI ---
+
     @Override
     public String toString() {
         return "Vaccine{" +
@@ -140,6 +154,7 @@ public class Vaccine {
                 ", vaccineName='" + vaccineName + '\'' +
                 ", manufacturer='" + manufacturer + '\'' +
                 ", price=" + price +
+                ", imageUrl='" + imageUrl + '\'' + // Thêm imageUrl vào toString
                 '}';
     }
 }

@@ -32,6 +32,24 @@
                     <c:forEach items="${vaccines}" var="vaccine">
                         <div class="col-md-6 col-lg-4">
                             <div class="vaccine-card">
+                                <c:if test="${not empty vaccine.imageUrl}">
+                                    <div class="vaccine-image-wrapper mb-3">
+                                        <img src="${pageContext.request.contextPath}${vaccine.imageUrl}" 
+                                             alt="${vaccine.vaccineName}"
+                                             class="vaccine-image"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="vaccine-image-placeholder" style="display: none;">
+                                            <i class="bi bi-shield-fill-plus"></i>
+                                        </div>
+                                    </div>
+                                </c:if>
+                                <c:if test="${empty vaccine.imageUrl}">
+                                    <div class="vaccine-image-wrapper mb-3">
+                                        <div class="vaccine-image-placeholder">
+                                            <i class="bi bi-shield-fill-plus"></i>
+                                        </div>
+                                    </div>
+                                </c:if>
                                 <h4>${vaccine.vaccineName}</h4>
                                 
                                 <div class="vaccine-info">

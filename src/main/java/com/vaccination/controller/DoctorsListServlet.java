@@ -30,8 +30,7 @@ public class DoctorsListServlet extends HttpServlet {
         
         List<User> doctors = new ArrayList<>();
         
-        doctors.addAll(userDAO.findByRole("DOCTOR"));
-        doctors.addAll(userDAO.findByRole("NURSE"));
+        doctors.addAll(userDAO.findByRole("MEDICAL"));
         doctors.addAll(userDAO.findByRole("RECEPTION"));
         
         request.setAttribute("doctors", doctors);

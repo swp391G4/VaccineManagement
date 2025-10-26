@@ -78,10 +78,19 @@
                         </c:choose>
                     </div>
                     <div class="col-md-6 ${loop.index % 2 == 1 ? 'order-md-1' : ''}">
-                        <img src="${pageContext.request.contextPath}/images/vaccine-image-${loop.index + 1}.jpg" 
-                             alt="${vaccine.vaccineName}" 
-                             class="content-image"
-                             onerror="this.src='https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=800&auto=format&fit=crop'">
+                        <c:choose>
+                            <c:when test="${not empty vaccine.imageUrl}">
+                                <img src="${pageContext.request.contextPath}${vaccine.imageUrl}" 
+                                     alt="${vaccine.vaccineName}" 
+                                     class="content-image"
+                                     onerror="this.src='https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=800&auto=format&fit=crop'">
+                            </c:when>
+                            <c:otherwise>
+                                <img src="https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=800&auto=format&fit=crop" 
+                                     alt="${vaccine.vaccineName}" 
+                                     class="content-image">
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
@@ -136,11 +145,18 @@
                 <c:forEach items="${doctors}" var="doctor" begin="0" end="3">
                     <div class="col-lg-3 col-md-4 col-sm-6">
                         <div class="doctor-card">
-                            <img src="${pageContext.request.contextPath}/images/doctor-placeholder.png" 
-                                 alt="${doctor.fullName}"
-                                 onerror="this.src='https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop'">
+                            <c:choose>
+                                <c:when test="${not empty doctor.imageUrl}">
+                                    <img src="${pageContext.request.contextPath}${doctor.imageUrl}" 
+                                         alt="${doctor.fullName}"
+                                         onerror="this.src='https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop'">
+                                </c:when>
+                                <c:otherwise>
+                                    <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop" 
+                                         alt="${doctor.fullName}">
+                                </c:otherwise>
+                            </c:choose>
                             <h5>${doctor.fullName}</h5>
-                            <p><i class="bi bi-award me-1"></i> Chuyên khoa Nhi</p>
                         </div>
                     </div>
                 </c:forEach>

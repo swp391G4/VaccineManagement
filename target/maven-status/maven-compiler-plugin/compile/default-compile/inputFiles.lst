@@ -1,39 +1,41 @@
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\AppointmentDAO.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\HomeServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\parent\AppointmentManagementServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\VaccinationScheduleTemplate.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\WorkingSchedule.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\parent\ChildManagementServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\AppointmentDetailServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\Child.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\CompletePaymentServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\VaccinationScheduleTemplateDAO.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\AppointmentCancelServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\parent\ParentDashboardServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\util\PasswordUtil.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\AppointmentsManageServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\util\DatabaseConnection.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\RegisterServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\VaccinationRecordDAO.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\Notification.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\UserDAO.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\Vaccine.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\VaccineDAO.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\AppointmentConfirmServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\UpdateNoteServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\parent\RecommendedVaccinesServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\CenterDAO.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\LoginServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\CancelPaymentServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\parent\VaccinationHistoryServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\VaccineStock.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\service\VaccinationService.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\VaccinationRecord.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\Center.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\Appointment.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\LogoutServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\reception\ReceptionDashboardServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\controller\parent\AppointmentBookingServlet.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\ChildDAO.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\model\User.java
-C:\java_fpt\JavaWeb\VaccineManagement-main\src\main\java\com\vaccination\dao\WorkingScheduleDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\parent\ChildManagementServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\parent\ParentDashboardServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\parent\VaccinationHistoryServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\AppointmentDetailServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\CancelPaymentServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\WorkingSchedule.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\VaccinesListServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\LogoutServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\User.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\AppointmentCancelServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\AppointmentDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\parent\AppointmentBookingServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\parent\AppointmentManagementServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\DoctorsListServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\ChildDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\VaccinationRecordDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\Child.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\util\DatabaseConnection.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\ReceptionDashboardServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\RegisterServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\Appointment.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\Center.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\Notification.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\VaccinationScheduleTemplate.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\WorkingScheduleDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\service\VaccinationService.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\parent\RecommendedVaccinesServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\VaccineStock.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\UpdateNoteServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\VaccineDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\AppointmentsManageServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\CompletePaymentServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\Vaccine.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\reception\AppointmentConfirmServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\UserDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\VaccinationScheduleTemplateDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\dao\CenterDAO.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\util\PasswordUtil.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\HomeServlet.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\model\VaccinationRecord.java
+C:\Users\Admin\OneDrive\Máy tính\VaccineManagement\src\main\java\com\vaccination\controller\LoginServlet.java

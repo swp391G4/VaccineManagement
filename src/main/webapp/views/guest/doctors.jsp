@@ -32,15 +32,22 @@
                     <c:forEach items="${doctors}" var="doctor">
                         <div class="col-md-6 col-lg-4">
                             <div class="doctor-profile-card">
-                                <img src="${pageContext.request.contextPath}/images/doctor-placeholder.png" 
-                                     alt="${doctor.fullName}"
-                                     onerror="this.src='https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop'">
+                                <c:choose>
+                                    <c:when test="${not empty doctor.imageUrl}">
+                                        <img src="${pageContext.request.contextPath}${doctor.imageUrl}" 
+                                             alt="${doctor.fullName}"
+                                             onerror="this.src='https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop'">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop" 
+                                             alt="${doctor.fullName}">
+                                    </c:otherwise>
+                                </c:choose>
                                 
                                 <h4>${doctor.fullName}</h4>
                                 
                                 <div class="doctor-specialty">
                                     <i class="bi bi-award-fill"></i>
-                                    <span>Chuyên khoa Nhi</span>
                                 </div>
                                 
                                 <div class="doctor-info">

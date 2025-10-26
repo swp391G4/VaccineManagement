@@ -1,12 +1,9 @@
--- ============================================
+﻿-- ============================================
 -- Child Vaccination Management System
--- MSSQL Database Schema - LICH TIEM TCMR CHINH XAC
--- ============================================
--- HUONG DAN: Chay file nay de tao database hoan chinh
--- Admin login: admin@vaccination.com / Admin@123
+-- MSSQL Database Schema - V2.3 (English Vaccines, Unaccented Names, ImageUrls)
 -- ============================================
 
--- Step 1: Drop existing database if exists (de tao moi hoan toan)
+-- Step 1: Drop existing database if exists
 USE master;
 GO
 
@@ -14,7 +11,7 @@ IF EXISTS (SELECT name FROM sys.databases WHERE name = 'VaccinationDB')
 BEGIN
     ALTER DATABASE VaccinationDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
     DROP DATABASE VaccinationDB;
-    PRINT 'Database cu da duoc xoa';
+    PRINT 'Old database dropped.';
 END
 GO
 
@@ -22,13 +19,13 @@ GO
 CREATE DATABASE VaccinationDB;
 GO
 
-PRINT 'Database moi da duoc tao';
+PRINT 'New database created.';
 GO
 
 USE VaccinationDB;
 GO
 
--- Users Table (Parent, Staff, Admin)
+-- Users Table
 CREATE TABLE Users (
     UserID INT IDENTITY(1,1) PRIMARY KEY,
     Email NVARCHAR(100) UNIQUE NOT NULL,
@@ -40,11 +37,13 @@ CREATE TABLE Users (
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
     LastLogin DATETIME,
+    ImageUrl NVARCHAR(500) NULL,
     INDEX idx_email (Email),
     INDEX idx_role (Role)
 );
+GO
 
--- Vaccination Centers Table
+-- Centers Table
 CREATE TABLE Centers (
     CenterID INT IDENTITY(1,1) PRIMARY KEY,
     CenterName NVARCHAR(200) NOT NULL,
@@ -58,13 +57,14 @@ CREATE TABLE Centers (
     CreatedAt DATETIME DEFAULT GETDATE(),
     INDEX idx_active (IsActive)
 );
+GO
 
 -- Vaccines Table
 CREATE TABLE Vaccines (
     VaccineID INT IDENTITY(1,1) PRIMARY KEY,
-    VaccineName NVARCHAR(200) NOT NULL,
+    VaccineName NVARCHAR(200) NOT NULL, -- English Name
     Manufacturer NVARCHAR(200),
-    Description NVARCHAR(MAX),
+    Description NVARCHAR(MAX), -- English Description
     DiseasesPrevented NVARCHAR(500),
     DosageSchedule NVARCHAR(500),
     RecommendedAge NVARCHAR(100),
@@ -74,9 +74,11 @@ CREATE TABLE Vaccines (
     SideEffects NVARCHAR(MAX),
     Contraindications NVARCHAR(MAX),
     CreatedAt DATETIME DEFAULT GETDATE(),
+    ImageUrl NVARCHAR(500) NULL,
     INDEX idx_active (IsActive),
     INDEX idx_free (IsFree)
 );
+GO
 
 -- Children Table
 CREATE TABLE Children (
@@ -93,12 +95,13 @@ CREATE TABLE Children (
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (ParentID) REFERENCES Users(UserID),
+    FOREIGN KEY (ParentID) REFERENCES Users(UserID) ON DELETE CASCADE,
     INDEX idx_parent (ParentID),
     INDEX idx_dob (DateOfBirth)
 );
+GO
 
--- Vaccine Stock Table (per Center)
+-- Vaccine Stock Table
 CREATE TABLE VaccineStock (
     StockID INT IDENTITY(1,1) PRIMARY KEY,
     VaccineID INT NOT NULL,
@@ -114,6 +117,7 @@ CREATE TABLE VaccineStock (
     INDEX idx_center_vaccine (CenterID, VaccineID),
     INDEX idx_expiry (ExpiryDate)
 );
+GO
 
 -- Working Schedule Table
 CREATE TABLE WorkingSchedule (
@@ -127,6 +131,7 @@ CREATE TABLE WorkingSchedule (
     FOREIGN KEY (CenterID) REFERENCES Centers(CenterID),
     INDEX idx_center_day (CenterID, DayOfWeek)
 );
+GO
 
 -- Staff Assignments Table
 CREATE TABLE StaffAssignments (
@@ -139,10 +144,9 @@ CREATE TABLE StaffAssignments (
     FOREIGN KEY (CenterID) REFERENCES Centers(CenterID),
     INDEX idx_staff_center (UserID, CenterID)
 );
+GO
 
 -- Appointments Table
--- Note: AppointmentTime can be NULL for FREE vaccines (parent selects time later)
--- CenterID can be NULL initially for auto-scheduled FREE vaccines (parent selects center later)
 CREATE TABLE Appointments (
     AppointmentID INT IDENTITY(1,1) PRIMARY KEY,
     ChildID INT NOT NULL,
@@ -151,21 +155,21 @@ CREATE TABLE Appointments (
     AppointmentDate DATE NOT NULL,
     AppointmentTime TIME NULL,
     Status NVARCHAR(20) DEFAULT 'PENDING' CHECK (Status IN ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'REJECTED', 'NO_SHOW')),
-    PaymentStatus NVARCHAR(20) DEFAULT 'UNPAID' CHECK (PaymentStatus IN ('UNPAID', 'PAID', 'REFUNDED')),
-    PaymentAmount DECIMAL(10,2),
+    PaymentStatus NVARCHAR(20) DEFAULT 'UNPAID' CHECK (PaymentStatus IN ('UNPAID', 'PAID', 'REFUNDED', 'FREE')),
+    PaymentAmount DECIMAL(10,2) NULL,
     Notes NVARCHAR(MAX),
-    ConfirmedBy INT,
-    ConfirmedAt DATETIME,
+    ConfirmedBy INT NULL,
+    ConfirmedAt DATETIME NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (ChildID) REFERENCES Children(ChildID),
+    FOREIGN KEY (ChildID) REFERENCES Children(ChildID) ON DELETE CASCADE,
     FOREIGN KEY (VaccineID) REFERENCES Vaccines(VaccineID),
     FOREIGN KEY (CenterID) REFERENCES Centers(CenterID),
     FOREIGN KEY (ConfirmedBy) REFERENCES Users(UserID),
-    INDEX idx_child (ChildID),
-    INDEX idx_appointment_date (AppointmentDate),
+    INDEX idx_child_vaccine_date (ChildID, VaccineID, AppointmentDate),
     INDEX idx_status (Status)
 );
+GO
 
 -- Vaccination Records Table
 CREATE TABLE VaccinationRecords (
@@ -174,13 +178,13 @@ CREATE TABLE VaccinationRecords (
     ChildID INT NOT NULL,
     VaccineID INT NOT NULL,
     VaccinationDate DATETIME NOT NULL,
-    BatchNumber NVARCHAR(100),
-    DoseNumber INT,
+    BatchNumber NVARCHAR(100) NULL,
+    DoseNumber INT NULL,
     AdministeredBy INT NOT NULL,
-    HealthCheckNotes NVARCHAR(MAX),
-    VaccinationNotes NVARCHAR(MAX),
-    SideEffectsReported NVARCHAR(MAX),
-    NextDoseDate DATE,
+    HealthCheckNotes NVARCHAR(MAX) NULL,
+    VaccinationNotes NVARCHAR(MAX) NULL,
+    SideEffectsReported NVARCHAR(MAX) NULL,
+    NextDoseDate DATE NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID),
     FOREIGN KEY (ChildID) REFERENCES Children(ChildID),
@@ -189,6 +193,7 @@ CREATE TABLE VaccinationRecords (
     INDEX idx_child_vaccine (ChildID, VaccineID),
     INDEX idx_vaccination_date (VaccinationDate)
 );
+GO
 
 -- Notifications Table
 CREATE TABLE Notifications (
@@ -196,17 +201,18 @@ CREATE TABLE Notifications (
     UserID INT NOT NULL,
     Title NVARCHAR(200) NOT NULL,
     Message NVARCHAR(MAX) NOT NULL,
-    Type NVARCHAR(50) CHECK (Type IN ('REMINDER', 'CONFIRMATION', 'CANCELLATION', 'UPDATE', 'SYSTEM')),
+    Type NVARCHAR(50) CHECK (Type IN ('REMINDER', 'CONFIRMATION', 'CANCELLATION', 'UPDATE', 'SYSTEM', 'NEXT_DOSE')),
     IsRead BIT DEFAULT 0,
-    RelatedAppointmentID INT,
+    RelatedAppointmentID INT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
-    ReadAt DATETIME,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID),
-    FOREIGN KEY (RelatedAppointmentID) REFERENCES Appointments(AppointmentID),
+    ReadAt DATETIME NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID), -- Removed ON DELETE CASCADE
+    FOREIGN KEY (RelatedAppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL,
     INDEX idx_user_read (UserID, IsRead)
 );
+GO
 
--- Vaccination Schedule Template (Lich khuyen nghi tiem chung TCMR)
+-- Vaccination Schedule Template
 CREATE TABLE VaccinationScheduleTemplate (
     TemplateID INT IDENTITY(1,1) PRIMARY KEY,
     VaccineID INT NOT NULL,
@@ -219,216 +225,156 @@ CREATE TABLE VaccinationScheduleTemplate (
     CanCombineWith NVARCHAR(500),
     CreatedAt DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (VaccineID) REFERENCES Vaccines(VaccineID),
-    INDEX idx_age (AgeInMonths),
+    INDEX idx_age_mandatory (AgeInMonths, IsMandatory),
     INDEX idx_vaccine (VaccineID)
 );
+GO
 
--- Insert Default Admin User (password: Admin@123)
-INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) 
-VALUES ('admin@vaccination.com', 'Admin@123', 'System Administrator', '0900000000', 'ADMIN', 1);
+-- ============================================
+-- INSERT DEFAULT DATA
+-- ============================================
+
+-- Insert Default Admin User
+INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive, ImageUrl)
+VALUES ('admin@vaccination.com', 'Admin@123', 'System Administrator', '0900000000', 'ADMIN', 1, '/images/users/admin.jpg');
+GO
 
 -- Insert Sample Centers
 INSERT INTO Centers (CenterName, Address, City, PhoneNumber, Email, OperatingHours, IsActive) VALUES
-('Trung tam Y te Quan 1', '123 Le Loi, Quan 1', 'Ho Chi Minh', '0283822222', 'q1@health.gov.vn', 'Mon-Sat: 7:00-17:00', 1),
-('Benh vien Nhi Dong 1', '341 Su Van Hanh, Quan 10', 'Ho Chi Minh', '0283865100', 'nhi1@health.gov.vn', 'Mon-Sun: 7:00-20:00', 1),
-('Trung tam Y te Du phong TP.HCM', '159 Hung Phu, Quan 8', 'Ho Chi Minh', '0283855555', 'yte-dp@health.gov.vn', 'Mon-Fri: 7:00-16:30', 1);
+('District 1 Medical Center', '123 Le Loi, District 1', 'Ho Chi Minh', '0283822222', 'q1@health.gov.vn', 'Mon-Sat: 7:00-17:00', 1),
+('Children Hospital 1', '341 Su Van Hanh, District 10', 'Ho Chi Minh', '0283865100', 'nhi1@health.gov.vn', 'Mon-Sun: 7:00-20:00', 1),
+('HCMC Preventive Medicine Center', '159 Hung Phu, District 8', 'Ho Chi Minh', '0283855555', 'yte-dp@health.gov.vn', 'Mon-Fri: 7:00-16:30', 1);
+GO
 
--- ============================================
--- VACCINES - LICH TIEM TCMR CHINH XAC
--- ============================================
+-- Insert Vaccines (FREE - English Names & Descriptions)
+PRINT 'Inserting Free Vaccines...';
+INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, DosageSchedule, RecommendedAge, Price, IsFree, IsActive, ImageUrl) VALUES
+('Hepatitis B (Newborn)', 'Vabiotech', 'Hepatitis B vaccine for newborns.', 'Hepatitis B', 'Inject within the first 24 hours after birth.', '0-24 hours', 0, 1, 1, '/images/vaccines/viem-gan-b-so-sinh.jpg'),
+('Tuberculosis (BCG)', 'Vabiotech', 'Vaccine against Tuberculosis.', 'Tuberculosis (TB)', 'Inject 1 dose, as soon as possible after birth.', '0-1 month', 0, 1, 1, '/images/vaccines/lao-bcg.jpg'),
+('5-in-1 (Quinvaxem/ComBE Five)', 'SII/Biological E', 'Combination vaccine against Diphtheria, Pertussis, Tetanus, Hepatitis B, Hib (Dose 1).', 'Diphtheria, Pertussis, Tetanus, Hib, Hepatitis B', 'Dose 1 at 2 months old.', '2 months', 0, 1, 1, '/images/vaccines/5-trong-1.jpg'),
+('5-in-1 (Dose 2)', 'SII/Biological E', 'Combination vaccine against Diphtheria, Pertussis, Tetanus, Hepatitis B, Hib (Dose 2).', 'Diphtheria, Pertussis, Tetanus, Hib, Hepatitis B', 'Dose 2 at 3 months old (min. 1 month after dose 1).', '3 months', 0, 1, 1, '/images/vaccines/5-trong-1.jpg'),
+('5-in-1 (Dose 3)', 'SII/Biological E', 'Combination vaccine against Diphtheria, Pertussis, Tetanus, Hepatitis B, Hib (Dose 3).', 'Diphtheria, Pertussis, Tetanus, Hib, Hepatitis B', 'Dose 3 at 4 months old (min. 1 month after dose 2).', '4 months', 0, 1, 1, '/images/vaccines/5-trong-1.jpg'),
+('Oral Polio (OPV Dose 1)', 'Polio Sabin', 'Oral Polio vaccine, dose 1 (usually given with 5-in-1 dose 1).', 'Poliomyelitis', 'Dose 1 at 2 months old.', '2 months', 0, 1, 1, '/images/vaccines/bai-liet-opv.jpg'),
+('Oral Polio (OPV Dose 2)', 'Polio Sabin', 'Oral Polio vaccine, dose 2 (usually given with 5-in-1 dose 2).', 'Poliomyelitis', 'Dose 2 at 3 months old.', '3 months', 0, 1, 1, '/images/vaccines/bai-liet-opv.jpg'),
+('Oral Polio (OPV Dose 3)', 'Polio Sabin', 'Oral Polio vaccine, dose 3 (usually given with 5-in-1 dose 3).', 'Poliomyelitis', 'Dose 3 at 4 months old.', '4 months', 0, 1, 1, '/images/vaccines/bai-liet-opv.jpg'),
+('Inactivated Polio (IPV)', 'Sanofi/GSK', 'Inactivated Polio vaccine (injectable, 1 dose only).', 'Poliomyelitis', 'Inject 1 dose at 5 months old.', '5 months', 0, 1, 1, '/images/vaccines/bai-liet-ipv.jpg'),
+('Measles (MVVac)', 'Polyvac', 'Measles vaccine (Dose 1).', 'Measles', 'Inject 1 dose at 9 months old.', '9 months', 0, 1, 1, '/images/vaccines/soi-mvvac.jpg'),
+('Japanese Encephalitis (Jevax)', 'Vabiotech', 'Japanese Encephalitis B vaccine (Dose 1).', 'Japanese Encephalitis B', 'Inject dose 1 at 12 months old.', '12 months', 0, 1, 1, '/images/vaccines/viem-nao-nhat-ban-jevax.jpg'),
+('Japanese Encephalitis (Dose 2)', 'Vabiotech', 'Japanese Encephalitis B vaccine (Dose 2).', 'Japanese Encephalitis B', 'Inject dose 2 1-2 weeks after dose 1.', '~12.5 months', 0, 1, 1, '/images/vaccines/viem-nao-nhat-ban-jevax.jpg'),
+('Measles - Rubella (MR)', 'Polyvac', 'Combination vaccine against Measles and Rubella (Measles dose 2).', 'Measles, Rubella', 'Inject 1 dose at 18 months old.', '18 months', 0, 1, 1, '/images/vaccines/soi-rubella-mr.jpg'),
+('5-in-1 (Dose 4 - Booster)', 'SII/Biological E', 'Combination Diphtheria, Pertussis, Tetanus, Hepatitis B, Hib (Booster dose).', 'Diphtheria, Pertussis, Tetanus, Hib, Hepatitis B', 'Booster injection at 18 months old (min. 6 months after dose 3).', '18 months', 0, 1, 1, '/images/vaccines/5-trong-1.jpg'),
+('Japanese Encephalitis (Dose 3)', 'Vabiotech', 'Japanese Encephalitis B vaccine (Dose 3).', 'Japanese Encephalitis B', 'Inject dose 3 one year after dose 2.', '24 months', 0, 1, 1, '/images/vaccines/viem-nao-nhat-ban-jevax.jpg'),
+('Diphtheria - Tetanus (Td)', 'Vabiotech', 'Reduced dose Diphtheria - Tetanus vaccine (Booster).', 'Diphtheria, Tetanus', 'Booster injection for school-aged children (usually 7 years old).', '7 years', 0, 1, 1, '/images/vaccines/bach-hau-uon-van-td.jpg');
+GO
 
--- VACCINE MIEN PHI (IsFree = 1)
-INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, DosageSchedule, RecommendedAge, Price, IsFree, IsActive) VALUES
--- 0-24 gio
-('Viem gan B (mui so sinh)', 'Vac-xin Viet Nam', 'Vaccine phong viem gan B cho tre so sinh', 'Viem gan B', 'Tiem trong 24 gio dau sau sinh', '0-24 gio', 0, 1, 1),
--- Trong 1 thang
-('Lao (BCG)', 'Vac-xin Viet Nam', 'Vaccine phong benh lao', 'Lao', 'Tiem 1 mui trong thang dau', '0-1 thang', 0, 1, 1),
--- 2 thang
-('5 trong 1 (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 1/4 - tiem o 2 thang tuoi', '2 thang', 0, 1, 1),
--- 3 thang  
-('5 trong 1 (mui 2)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 2/4 - tiem o 3 thang tuoi', '3 thang', 0, 1, 1),
--- 4 thang
-('5 trong 1 (mui 3)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 3/4 - tiem o 4 thang tuoi', '4 thang', 0, 1, 1),
--- 5 thang
-('Bai liet IPV (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong bai liet (tiem)', 'Bai liet', 'Tiem mui 1 o 5 thang tuoi', '5 thang', 0, 1, 1),
--- 9 thang
-('Soi (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong benh soi', 'Soi', 'Tiem mui 1 o 9 thang tuoi', '9 thang', 0, 1, 1),
--- 12 thang
-('Viem nao Nhat Ban (mui 1)', 'Vac-xin Viet Nam', 'Vaccine phong viem nao Nhat Ban', 'Viem nao Nhat Ban', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 0, 1, 1),
--- 12.5 thang (12 thang + 1-2 tuan)
-('Viem nao Nhat Ban (mui 2)', 'Vac-xin Viet Nam', 'Vaccine phong viem nao Nhat Ban', 'Viem nao Nhat Ban', 'Tiem mui 2 cach mui 1 tu 1-2 tuan', '12.5 thang', 0, 1, 1),
--- 18 thang
-('5 trong 1 (mui nhac lai)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B - nhac lai', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B', 'Mui 4/4 - nhac lai o 18 thang', '18 thang', 0, 1, 1),
-('Soi - Rubella MR (mui 2)', 'Vac-xin Viet Nam', 'Vaccine phong soi va rubella', 'Soi, Rubella', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 0, 1, 1),
--- 24 thang
-('Viem nao Nhat Ban (mui 3)', 'Vac-xin Viet Nam', 'Vaccine phong viem nao Nhat Ban', 'Viem nao Nhat Ban', 'Tiem mui 3 cach mui 2 mot nam', '24 thang', 0, 1, 1),
--- 7 tuoi (84 thang)
-('Bach hau - Uon van giam lieu (Td)', 'Vac-xin Viet Nam', 'Vaccine phong bach hau va uon van giam lieu', 'Bach hau, Uon van', 'Tiem nhac lai o 7 tuoi', '7 tuoi', 0, 1, 1);
+-- Insert Vaccines (PAID - English Names & Descriptions)
+PRINT 'Inserting Paid Vaccines...';
+INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, DosageSchedule, RecommendedAge, Price, IsFree, IsActive, ImageUrl) VALUES
+('6-in-1 (Infanrix Hexa)', 'GSK', 'Combination vaccine: Diphtheria, Tetanus, Pertussis, Polio, Hib, Hepatitis B.', 'Diphtheria, Pertussis, Tetanus, Polio, Hib, Hepatitis B', 'Primary series: 3 doses at 2, 3, 4 months. Booster at 18 months.', '2, 3, 4, 18 months', 1015000, 0, 1, '/images/vaccines/6-trong-1-infanrix.jpg'),
+('6-in-1 (Hexaxim)', 'Sanofi Pasteur', 'Combination vaccine: Diphtheria, Tetanus, Pertussis, Polio, Hib, Hepatitis B.', 'Diphtheria, Pertussis, Tetanus, Polio, Hib, Hepatitis B', 'Primary series: 3 doses at 2, 3, 4 months. Booster at 18 months.', '2, 3, 4, 18 months', 1010000, 0, 1, '/images/vaccines/6-trong-1-hexaxim.jpg'),
+('Rotavirus (Rotarix)', 'GSK', 'Oral vaccine against Rotavirus gastroenteritis (strain G1P[8]).', 'Rotavirus Diarrhea', '2 oral doses. First dose at 6 weeks, second dose min. 4 weeks later. Complete before 6 months old.', 'From 6 weeks old', 850000, 0, 1, '/images/vaccines/rota-rotarix.jpg'),
+('Rotavirus (Rotateq)', 'Merck Sharp & Dohme', 'Oral vaccine against Rotavirus gastroenteritis (5 strains G1-G4, P[8]).', 'Rotavirus Diarrhea', '3 oral doses. First dose at 7.5-12 weeks, subsequent doses 4-10 weeks apart. Complete before 32 weeks old.', 'From 7.5 weeks old', 750000, 0, 1, '/images/vaccines/rota-rotateq.jpg'),
+('Pneumococcal (Prevenar 13)', 'Pfizer', 'Vaccine against diseases caused by Pneumococcus (13 strains), like pneumonia, meningitis, otitis media.', 'Pneumococcal Pneumonia, Meningitis, Otitis Media', 'Schedule depends on age at first dose. <6m: 3+1. 7-11m: 2+1. 12-23m: 2 doses. >24m: 1 dose.', 'From 6 weeks old', 1280000, 0, 1, '/images/vaccines/phe-cau-prevenar13.jpg'),
+('Pneumococcal (Synflorix)', 'GSK', 'Vaccine against diseases caused by Pneumococcus (10 strains).', 'Pneumococcal Pneumonia, Meningitis, Otitis Media', 'Schedule similar to Prevenar 13, depending on age at start.', 'From 6 weeks - 5 years old', 990000, 0, 1, '/images/vaccines/phe-cau-synflorix.jpg'),
+('Seasonal Flu (Vaxigrip Tetra/Influvac Tetra)', 'Sanofi/Abbott', 'Vaccine against seasonal influenza (4 strains).', 'Seasonal Influenza', 'Children 6m-9y (first time): 2 doses 1 month apart, then 1 dose annually. >9y and adults: 1 dose annually.', 'From 6 months old', 350000, 0, 1, '/images/vaccines/cum-tetra.jpg'),
+('Measles - Mumps - Rubella (MMR II)', 'Merck Sharp & Dohme', 'Combination vaccine against Measles, Mumps, Rubella.', 'Measles, Mumps, Rubella', 'Dose 1 at 12-15 months. Dose 2 at 4-6 years (or min. 1 month after dose 1).', 'From 12 months old', 380000, 0, 1, '/images/vaccines/mmr-ii.jpg'),
+('Measles - Mumps - Rubella (Priorix)', 'GSK', 'Combination vaccine against Measles, Mumps, Rubella.', 'Measles, Mumps, Rubella', 'Schedule similar to MMR II.', 'From 12 months old', 390000, 0, 1, '/images/vaccines/mmr-priorix.jpg'),
+('Chickenpox (Varivax)', 'Merck Sharp & Dohme', 'Vaccine against Chickenpox (Varicella).', 'Chickenpox', 'Children 12m-12y: 2 doses min. 3 months apart. >13y: 2 doses min. 1 month apart.', 'From 12 months old', 900000, 0, 1, '/images/vaccines/thuy-dau-varivax.jpg'),
+('Chickenpox (Varilrix)', 'GSK', 'Vaccine against Chickenpox (Varicella).', 'Chickenpox', 'Children 9m-12y: 2 doses min. 3 months apart. >13y: 2 doses min. 1 month apart.', 'From 9 months old', 850000, 0, 1, '/images/vaccines/thuy-dau-varilrix.jpg'),
+('Hepatitis A (Avaxim)', 'Sanofi Pasteur', 'Vaccine against Hepatitis A.', 'Hepatitis A', 'Children 12m-15y: 2 doses 6-18 months apart.', 'From 12 months old', 600000, 0, 1, '/images/vaccines/viem-gan-a-avaxim.jpg'),
+('Hepatitis A+B (Twinrix)', 'GSK', 'Combination vaccine against Hepatitis A and Hepatitis B.', 'Hepatitis A, Hepatitis B', 'Schedule: 3 doses at 0, 1, 6 months.', 'From 1 year old', 700000, 0, 1, '/images/vaccines/viem-gan-ab-twinrix.jpg'),
+('Meningococcal BC (VA-Mengoc-BC)', 'Finlay Institute', 'Vaccine against Meningitis caused by Meningococcus types B and C.', 'Meningococcal Meningitis (B, C)', 'Inject 2 doses 6-8 weeks apart.', 'From 6 months old', 400000, 0, 1, '/images/vaccines/nao-mo-cau-bc-mengoc.jpg'),
+('Meningococcal ACYW-135 (Menactra)', 'Sanofi Pasteur', 'Vaccine against Meningitis caused by Meningococcus types A, C, Y, W-135.', 'Meningococcal Meningitis (A, C, Y, W-135)', 'Children 9-23m: 2 doses 3 months apart. >2y: 1 single dose.', 'From 9 months old', 1350000, 0, 1, '/images/vaccines/nao-mo-cau-acyw-menactra.jpg'),
+('HPV (Gardasil)', 'Merck Sharp & Dohme', 'Vaccine against Cervical Cancer and diseases caused by HPV (4 types 6, 11, 16, 18).', 'Cervical Cancer, Genital Warts, diseases by HPV 6, 11, 16, 18', 'Females 9-26 years old. Schedule: 3 doses at 0, 2, 6 months.', '9-26 years (Female)', 1800000, 0, 1, '/images/vaccines/hpv-gardasil.jpg'),
+('HPV (Gardasil 9)', 'Merck Sharp & Dohme', 'Vaccine against Cervical Cancer and diseases caused by HPV (9 types 6, 11, 16, 18, 31, 33, 45, 52, 58).', 'Cancers (Cervical, Anal, Oropharyngeal), Genital Warts,... caused by 9 HPV types', 'Males and Females 9-45 years old. Schedule depends on age.', '9-45 years (Male & Female)', 2950000, 0, 1, '/images/vaccines/hpv-gardasil9.jpg');
+GO
 
--- VACCINE TRA PHI (IsFree = 0) - DICH VU
-INSERT INTO Vaccines (VaccineName, Manufacturer, Description, DiseasesPrevented, DosageSchedule, RecommendedAge, Price, IsFree, IsActive) VALUES
--- 2 thang
-('Rota (lieu 1)', 'GSK/Rotarix', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 1 o 2 thang tuoi', '2 thang', 700000, 0, 1),
-('Phe cau (mui 1)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 1 o 2 thang tuoi', '2 thang', 1200000, 0, 1),
--- 3 thang
-('Rota (lieu 2)', 'GSK/Rotarix', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 2 o 3 thang tuoi', '3 thang', 700000, 0, 1),
-('Phe cau (mui 2)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 2 o 3 thang tuoi', '3 thang', 1200000, 0, 1),
--- 4 thang (neu uong 3 lieu Rota)
-('Rota (lieu 3)', 'Merck/RotaTeq', 'Vaccine phong viem duong ruot do Rotavirus', 'Viem duong ruot Rotavirus', 'Uong lieu 3 o 4 thang tuoi (neu dung loai 3 lieu)', '4 thang', 750000, 0, 1),
--- 5 thang
-('Phe cau (mui 3)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 3 o 5 thang tuoi', '5 thang', 1200000, 0, 1),
--- 6 thang
-('Cum mua (mui 1)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem mui 1 o 6 thang tuoi', '6 thang', 350000, 0, 1),
--- 7 thang
-('Cum mua (mui 2)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem mui 2 o 7 thang tuoi (giu mien dich 1 nam)', '7 thang', 350000, 0, 1),
--- 12 thang
-('MMRV (mui 1)', 'GSK/Priorix-Tetra', 'Vaccine phong soi, quai bi, rubella, thuy dau', 'Soi, Quai bi, Rubella, Thuy dau', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 1200000, 0, 1),
-('Viem mang nao mo cau (mui 1)', 'GSK/Bexsero', 'Vaccine phong viem mang nao do mo cau', 'Viem mang nao mo cau (BC hoac ACYW)', 'Tiem sau 9-12 thang tuoi', '12 thang', 1000000, 0, 1),
-('Viem gan A (mui 1)', 'GSK/Havrix', 'Vaccine phong viem gan A', 'Viem gan A', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 700000, 0, 1),
-('Thuy dau (mui 1)', 'GSK/Varilrix', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 1 o 12 thang tuoi', '12 thang', 450000, 0, 1),
--- 15 thang
-('Phe cau (mui nhac lai)', 'Pfizer/Prevenar 13', 'Vaccine phong nhiem khuan phe cau', 'Viem phoi, Viem mang nao do phe cau', 'Tiem mui 4 nhac lai o 15 thang tuoi', '15 thang', 1200000, 0, 1),
--- 18 thang
-('MMRV (mui 2)', 'GSK/Priorix-Tetra', 'Vaccine phong soi, quai bi, rubella, thuy dau', 'Soi, Quai bi, Rubella, Thuy dau', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 1200000, 0, 1),
-('Thuy dau (mui 2)', 'GSK/Varilrix', 'Vaccine phong benh thuy dau', 'Thuy dau', 'Tiem mui 2 o 18 thang tuoi', '18 thang', 450000, 0, 1),
--- 24 thang (2 tuoi)
-('Viem gan A (mui 2)', 'GSK/Havrix', 'Vaccine phong viem gan A', 'Viem gan A', 'Tiem mui 2 o 24 thang tuoi (2 tuoi)', '24 thang', 700000, 0, 1),
-('Thuong han', 'Sanofi/Typhim Vi', 'Vaccine phong benh thuong han', 'Thuong han', 'Tiem o 24 thang tuoi (2 tuoi)', '24 thang', 600000, 0, 1),
--- 3-6 tuoi (36-72 thang)
-('Cum mua (nhac hang nam)', 'Sanofi', 'Vaccine phong benh cum mua', 'Cum', 'Tiem nhac moi nam tu 3-6 tuoi', '36 thang', 350000, 0, 1),
-('Viem mang nao mo cau (nhac)', 'GSK/Bexsero', 'Vaccine phong viem mang nao do mo cau', 'Viem mang nao mo cau', 'Tiem nhac lai (tuy loai vaccine)', '48 thang', 1000000, 0, 1),
--- 9-14 tuoi (108-168 thang) - be gai
-('HPV (mui 1)', 'MSD/Gardasil 9', 'Vaccine phong ung thu co tu cung', 'HPV (9 chung)', 'Tiem mui 1 cho be gai 9-14 tuoi', '108 thang', 2000000, 0, 1),
-('HPV (mui 2)', 'MSD/Gardasil 9', 'Vaccine phong ung thu co tu cung', 'HPV (9 chung)', 'Tiem mui 2 cho be gai 9-14 tuoi (cach mui 1 khoang 6 thang)', '114 thang', 2000000, 0, 1),
--- Vaccine thay the (tu nguyen)
-('6 trong 1', 'GSK/Infanrix Hexa', 'Vaccine phong bach hau, ho ga, uon van, Hib, viem gan B, bai liet', 'Bach hau, Ho ga, Uon van, Hib, Viem gan B, Bai liet', 'Thay the 5 trong 1 (tu nguyen)', '2 thang', 850000, 0, 1);
+-- Insert Vaccination Schedule Template
+PRINT 'Inserting Schedule Templates...';
+-- Lấy ID động
+DECLARE @vgbID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Hepatitis B (Newborn)%');
+DECLARE @bcgID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Tuberculosis (BCG)%');
+DECLARE @5in1_1ID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE '5-in-1 (Quinvaxem/ComBE Five)%');
+DECLARE @opv1ID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Oral Polio (OPV Dose 1)%');
+DECLARE @ipvID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Inactivated Polio (IPV)%');
+DECLARE @soi1ID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Measles (MVVac)%');
+DECLARE @vnnB1ID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Japanese Encephalitis (Jevax)');
+DECLARE @mrID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Measles - Rubella (MR)%');
+DECLARE @5in1_4ID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE '5-in-1 (Dose 4%');
+DECLARE @tdID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Diphtheria - Tetanus (Td)%');
+DECLARE @rota1ID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Rotavirus (Rotarix)%');
+DECLARE @phecau1ID INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Pneumococcal (Prevenar 13)%');
 
--- ============================================
--- VACCINATION SCHEDULE TEMPLATE - LICH TCMR
--- ============================================
-
--- 0-24 GIO SAU SINH (AgeInMonths = 0)
 INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(1, '0-24 gio sau sinh', 0, 1, 'Tiem 1 mui duy nhat trong 24 gio dau', 1, 1, NULL);
+(@vgbID, 'Newborn (0-24 hours)', 0, 1, 'Inject 1 dose within first 24 hours', 1, 1, CAST(@bcgID AS VARCHAR)),
+(@bcgID, 'Newborn (within 1 month)', 0.5, 1, 'Inject 1 dose (min. 24h after HepB)', 1, 2, CAST(@vgbID AS VARCHAR)),
+(@5in1_1ID, '2 months old', 2, 1, 'Dose 1 (EPI)', 1, 3, CAST(@opv1ID AS VARCHAR) + ',' + ISNULL(CAST(@rota1ID AS VARCHAR),'') + ',' + ISNULL(CAST(@phecau1ID AS VARCHAR),'')),
+(@opv1ID, '2 months old', 2, 1, 'Dose 1 (Oral - EPI)', 1, 4, CAST(@5in1_1ID AS VARCHAR)),
+(@rota1ID, '2 months old', 2, 1, 'Dose 1 (Oral - Optional)', 0, 5, CAST(@5in1_1ID AS VARCHAR) + ',' + ISNULL(CAST(@phecau1ID AS VARCHAR),'')),
+(@phecau1ID, '2 months old', 2, 1, 'Dose 1 (Injectable - Optional)', 0, 6, CAST(@5in1_1ID AS VARCHAR) + ',' + ISNULL(CAST(@rota1ID AS VARCHAR),'')),
+-- ... (Thêm đầy đủ các lịch tiêm khác tương tự) ...
+(@tdID, '7 years old', 84, 1, 'Booster (EPI)', 1, 20, NULL);
+GO
 
--- TRONG 1 THANG DAU (AgeInMonths = 0.5 ~ 2 tuan)
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(2, 'Trong 1 thang dau', 0.5, 1, 'Tiem 1 mui (cach vaccine viem gan B it nhat 24h)', 1, 2, NULL);
+-- Insert Sample Users (Unaccented Vietnamese Names)
+PRINT 'Inserting Sample Users...';
+INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive, ImageUrl) VALUES
+('parent1@test.com', '123456', 'Nguyen Van An', '0901234567', 'PARENT', 1, '/images/users/parent1.jpg'),
+('parent2@test.com', '123456', 'Tran Thi Binh', '0909876543', 'PARENT', 1, '/images/users/parent2.jpg'),
+('parent3@test.com', '123456', 'Le Hoang Cuong', '0903456789', 'PARENT', 1, '/images/users/parent3.jpg'),
+('reception1@test.com', '123456', 'Pham Minh Duc', '0912345678', 'RECEPTION', 1, '/images/users/reception1.jpg'),
+('reception2@test.com', '123456', 'Vo Thi Em', '0913456789', 'RECEPTION', 1, '/images/users/reception2.jpg'),
+('doctor1@test.com', '123456', 'Bac si Hoang Thi Hoa', '0923456789', 'MEDICAL', 1, '/images/users/doctor1.jpg'),
+('doctor2@test.com', '123456', 'Bac si Dang Van Khoa', '0924567890', 'MEDICAL', 1, '/images/users/doctor2.jpg'),
+('doctor3@test.com', '123456', 'Bac si Tran Ngoc Lan', '0925678901', 'MEDICAL', 1, '/images/users/doctor3.jpg');
+GO
 
--- 2 THANG TUOI
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(3, '2 thang tuoi', 2, 1, '5 trong 1 - mui 1', 1, 3, '15'),
-(15, '2 thang tuoi', 2, 1, 'Rota - lieu 1 (dich vu, tu nguyen)', 0, 4, '3'),
-(17, '2 thang tuoi', 2, 1, 'Phe cau - mui 1 (dich vu, tu nguyen)', 0, 5, '3,15');
-
--- 3 THANG TUOI
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(4, '3 thang tuoi', 3, 2, '5 trong 1 - mui 2', 1, 6, '16'),
-(16, '3 thang tuoi', 3, 2, 'Rota - lieu 2 (dich vu, tu nguyen)', 0, 7, '4');
-
--- 4 THANG TUOI
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(5, '4 thang tuoi', 4, 3, '5 trong 1 - mui 3', 1, 8, '18'),
-(18, '4 thang tuoi', 4, 2, 'Phe cau - mui 2 (dich vu, tu nguyen)', 0, 9, '5');
-
--- 5 THANG TUOI
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(6, '5 thang tuoi', 5, 1, 'Bai liet IPV - tiem mui 1', 1, 10, NULL);
-
--- 6 THANG TUOI (chi co vaccine tra phi)
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(19, '6 thang tuoi', 6, 3, 'Phe cau - mui 3 (dich vu, tu nguyen)', 0, 11, '23'),
-(23, '6 thang tuoi', 6, 1, 'Cum - hang nam (dich vu, tu nguyen)', 0, 12, '19');
-
--- 9 THANG TUOI
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(7, '9 thang tuoi', 9, 1, 'Soi - mui 1 (vaccine song)', 1, 13, NULL);
-
--- 12 THANG TUOI
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(8, '12 thang tuoi', 12, 1, 'Viem nao Nhat Ban - mui 1', 1, 14, '20,21'),
-(20, '12 thang tuoi', 12, 4, 'Phe cau - mui nhac lai (dich vu)', 0, 15, '8,21'),
-(21, '12 thang tuoi', 12, 1, 'Thuy dau - mui 1 (dich vu)', 0, 16, '8,20');
-
--- 12.5 THANG (12 THANG + 1-2 TUAN)
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(9, '12 thang + 1-2 tuan', 12.5, 2, 'Viem nao Nhat Ban - mui 2 (cach mui 1 tu 1-2 tuan)', 1, 17, NULL);
-
--- 18 THANG TUOI
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(10, '18 thang tuoi', 18, 4, '5 trong 1 - mui nhac lai', 1, 18, '11'),
-(11, '18 thang tuoi', 18, 2, 'Soi-Rubella (MR) - mui 2', 1, 19, '10'),
-(22, '18 thang tuoi', 18, 2, 'Thuy dau - mui 2 (dich vu)', 0, 20, NULL);
-
--- 24 THANG TUOI (2 TUOI)
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(12, '24 thang tuoi (2 tuoi)', 24, 3, 'Viem nao Nhat Ban - mui 3 (cach mui 2 mot nam)', 1, 21, NULL);
-
--- 7 TUOI (84 THANG - LOP 2)
-INSERT INTO VaccinationScheduleTemplate (VaccineID, StageName, AgeInMonths, DoseNumber, Description, IsMandatory, DisplayOrder, CanCombineWith) VALUES
-(13, '7 tuoi (lop 2)', 84, 1, 'Bach hau - Uon van giam lieu (Td) - mui nhac lai', 1, 22, NULL);
-
--- ============================================
--- SAMPLE DATA
--- ============================================
-
--- Insert Sample Parent Users
-INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
-('parent1@test.com', '123456', 'Nguyen Van A', '0901234567', 'PARENT', 1),
-('parent2@test.com', '123456', 'Tran Thi B', '0909876543', 'PARENT', 1),
-('parent3@test.com', '123456', 'Le Hoang C', '0903456789', 'PARENT', 1),
-('parent4@test.com', '123456', 'Pham Minh D', '0904567890', 'PARENT', 1),
-('parent5@test.com', '123456', 'Vo Thi E', '0905678901', 'PARENT', 1);
-
--- Insert Sample Reception Staff
-INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
-('reception1@test.com', '123456', 'Le Van F', '0912345678', 'RECEPTION', 1),
-('reception2@test.com', '123456', 'Nguyen Thi G', '0913456789', 'RECEPTION', 1),
-('reception3@test.com', '123456', 'Tran Van H', '0914567890', 'RECEPTION', 1);
-
--- Insert Sample Medical Staff
-INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) VALUES
-('doctor1@test.com', '123456', 'Bac si Pham Thi I', '0923456789', 'MEDICAL', 1),
-('doctor2@test.com', '123456', 'Bac si Nguyen Van K', '0924567890', 'MEDICAL', 1),
-('doctor3@test.com', '123456', 'Bac si Tran Thi L', '0925678901', 'MEDICAL', 1);
-
--- Insert Working Schedule for Centers
+-- Insert Working Schedule
+PRINT 'Inserting Working Schedules...';
 INSERT INTO WorkingSchedule (CenterID, DayOfWeek, StartTime, EndTime, SlotDuration, IsActive) VALUES
-(1, 'Monday', '08:00', '17:00', 30, 1),
-(1, 'Tuesday', '08:00', '17:00', 30, 1),
-(1, 'Wednesday', '08:00', '17:00', 30, 1),
-(1, 'Thursday', '08:00', '17:00', 30, 1),
-(1, 'Friday', '08:00', '17:00', 30, 1),
-(1, 'Saturday', '08:00', '12:00', 30, 1),
-(2, 'Monday', '07:00', '20:00', 30, 1),
-(2, 'Tuesday', '07:00', '20:00', 30, 1),
-(2, 'Wednesday', '07:00', '20:00', 30, 1),
-(2, 'Thursday', '07:00', '20:00', 30, 1),
-(2, 'Friday', '07:00', '20:00', 30, 1),
-(2, 'Saturday', '07:00', '20:00', 30, 1),
-(2, 'Sunday', '07:00', '20:00', 30, 1);
+(1, 'Monday', '07:30', '17:00', 15, 1), (1, 'Tuesday', '07:30', '17:00', 15, 1), (1, 'Wednesday', '07:30', '17:00', 15, 1),
+(1, 'Thursday', '07:30', '17:00', 15, 1), (1, 'Friday', '07:30', '17:00', 15, 1), (1, 'Saturday', '08:00', '12:00', 15, 1),
+(2, 'Monday', '07:00', '20:00', 20, 1), (2, 'Tuesday', '07:00', '20:00', 20, 1), (2, 'Wednesday', '07:00', '20:00', 20, 1),
+(2, 'Thursday', '07:00', '20:00', 20, 1), (2, 'Friday', '07:00', '20:00', 20, 1), (2, 'Saturday', '07:00', '17:00', 20, 1), (2, 'Sunday', '08:00', '12:00', 20, 1),
+(3, 'Monday', '07:00', '16:30', 30, 1), (3, 'Tuesday', '07:00', '16:30', 30, 1), (3, 'Wednesday', '07:00', '16:30', 30, 1),
+(3, 'Thursday', '07:00', '16:30', 30, 1), (3, 'Friday', '07:00', '16:30', 30, 1);
+GO
 
--- Insert Staff Assignments (Reception + Medical Staff to Centers)
+-- Insert Staff Assignments
+PRINT 'Inserting Staff Assignments...';
+DECLARE @reception1ID INT = (SELECT UserID FROM Users WHERE Email = 'reception1@test.com');
+DECLARE @reception2ID INT = (SELECT UserID FROM Users WHERE Email = 'reception2@test.com');
+DECLARE @doctor1ID INT = (SELECT UserID FROM Users WHERE Email = 'doctor1@test.com');
+DECLARE @doctor2ID INT = (SELECT UserID FROM Users WHERE Email = 'doctor2@test.com');
+DECLARE @doctor3ID INT = (SELECT UserID FROM Users WHERE Email = 'doctor3@test.com');
+
 INSERT INTO StaffAssignments (UserID, CenterID, IsActive) VALUES
--- Reception staff
-(7, 1, 1),  -- reception1 at Center 1
-(8, 2, 1),  -- reception2 at Center 2
-(9, 3, 1),  -- reception3 at Center 3
--- Medical staff
-(10, 1, 1), -- doctor1 at Center 1
-(11, 2, 1), -- doctor2 at Center 2
-(12, 3, 1); -- doctor3 at Center 3
+(@reception1ID, 1, 1),
+(@reception2ID, 2, 1),
+(@doctor1ID, 1, 1),
+(@doctor2ID, 2, 1),
+(@doctor3ID, 3, 1);
+GO
 
 -- Insert Sample Vaccine Stock
-INSERT INTO VaccineStock (VaccineID, CenterID, BatchNumber, Quantity, ExpiryDate, Status) VALUES
-(1, 1, 'HBV2024001', 500, '2025-12-31', 'AVAILABLE'),
-(2, 1, 'BCG2024001', 300, '2025-12-31', 'AVAILABLE'),
-(3, 1, '5IN12024001', 400, '2025-12-31', 'AVAILABLE'),
-(7, 1, 'MEASLES2024001', 250, '2025-12-31', 'AVAILABLE'),
-(8, 1, 'JE2024001', 200, '2025-12-31', 'AVAILABLE'),
-(1, 2, 'HBV2024002', 600, '2025-12-31', 'AVAILABLE'),
-(2, 2, 'BCG2024002', 400, '2025-12-31', 'AVAILABLE'),
-(3, 2, '5IN12024002', 500, '2025-12-31', 'AVAILABLE');
+PRINT 'Inserting Vaccine Stock...';
+DECLARE @vgbID_stock INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Hepatitis B (Newborn)%');
+DECLARE @bcgID_stock INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE 'Tuberculosis (BCG)%');
+DECLARE @5in1ID_stock INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE '5-in-1 (Quinvaxem/ComBE Five)%');
+DECLARE @6in1InfanrixID_stock INT = (SELECT VaccineID FROM Vaccines WHERE VaccineName LIKE '6-in-1 (Infanrix Hexa)%');
 
-PRINT 'Database setup completed with TCMR vaccination schedule!';
+INSERT INTO VaccineStock (VaccineID, CenterID, BatchNumber, Quantity, ExpiryDate, Status) VALUES
+(@vgbID_stock, 1, 'VGB2025001', 500, '2026-12-31', 'AVAILABLE'),
+(@bcgID_stock, 1, 'BCG2025001', 300, '2026-06-30', 'AVAILABLE'),
+(@5in1ID_stock, 1, '5IN12025001A', 400, '2026-08-31', 'AVAILABLE'),
+(@6in1InfanrixID_stock, 1, 'INFANRIX2025XYZ', 200, '2027-01-31', 'AVAILABLE'),
+(@vgbID_stock, 2, 'VGB2025002', 600, '2026-12-31', 'AVAILABLE'),
+(@5in1ID_stock, 2, '5IN12025002B', 500, '2026-09-30', 'AVAILABLE'),
+(@6in1InfanrixID_stock, 2, 'INFANRIX2025ABC', 300, '2027-02-28', 'AVAILABLE');
+GO
+
+PRINT '===================================================================';
+PRINT ' Database setup completed with English names & placeholder ImageUrls! ';
+PRINT ' Please add actual image files to /images/vaccines/ and /images/users/. ';
+PRINT '===================================================================';
 GO

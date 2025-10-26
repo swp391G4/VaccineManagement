@@ -637,6 +637,173 @@ a:hover {
 }
 
 /* ==========================================
+   VACCINE & DOCTORS LIST PAGES
+   ========================================== */
+.vaccine-list-header,
+.doctors-list-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 4rem 0 3rem;
+    padding-top: 7rem;
+    color: white;
+    margin-bottom: 3rem;
+}
+
+.vaccine-list-header h1,
+.doctors-list-header h1 {
+    color: white;
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 0.5rem;
+}
+
+.vaccine-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.vaccine-image-wrapper {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.vaccine-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-smooth);
+}
+
+.vaccine-card:hover .vaccine-image {
+    transform: scale(1.05);
+}
+
+.vaccine-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+}
+
+.vaccine-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+}
+
+.vaccine-card h4 {
+    color: #667eea;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.vaccine-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.vaccine-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.vaccine-info-item i {
+    color: #667eea;
+}
+
+.vaccine-description {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.no-vaccines,
+.no-doctors {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+}
+
+.doctor-profile-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-align: center;
+}
+
+.doctor-profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+}
+
+.doctor-profile-card img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    object-fit: cover;
+    border: 4px solid #667eea;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.doctor-profile-card h4 {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.doctor-specialty {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.doctor-info {
+    color: #666;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.doctor-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.doctor-info-item i {
+    color: #667eea;
+    width: 20px;
+}
+
+/* ==========================================
    RESPONSIVE DESIGN
    ========================================== */
 @media (max-width: 991px) {
@@ -678,6 +845,11 @@ a:hover {
     .icon-feature,
     .doctor-card {
         margin-bottom: 2rem;
+    }
+    
+    .vaccine-list-header,
+    .doctors-list-header {
+        padding-top: 6rem;
     }
 }
 
