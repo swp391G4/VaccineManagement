@@ -72,3 +72,9 @@ Desktop.ini
 *.sqlite
 uploads/
 logs/
+src/main/resources/database.properties
+target/classes/com/vaccination/controller/LoginServlet.class
+target/classes/com/vaccination/controller/parent/ChildManagementServlet.class
+target/classes/database.properties
+target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
