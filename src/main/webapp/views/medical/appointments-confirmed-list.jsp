@@ -100,7 +100,7 @@
                 <li class="sidebar-menu-item">
                     <a href="${pageContext.request.contextPath}/medical/vaccinations" class="sidebar-menu-link">
                         <i class="bi bi-syringe"></i>
-                        <span>Thực hiện tiêm chủng</span>
+                        <span>Quản lý Vắc xin</span>
                     </a>
                 </li>
             </ul>
