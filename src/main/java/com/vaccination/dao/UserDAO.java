@@ -10,11 +10,9 @@ import java.util.List;
 public class UserDAO {
 
     // ... (Các hàm findByEmail, findById, createUser, updateUser, updatePassword, updateLastLogin giữ nguyên) ...
-
     public User findByEmail(String email) {
         String sql = "SELECT * FROM Users WHERE Email = ?";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -28,8 +26,7 @@ public class UserDAO {
 
     public User findById(int userId) {
         String sql = "SELECT * FROM Users WHERE UserID = ?";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -43,10 +40,9 @@ public class UserDAO {
 
     public boolean createUser(User user) {
         // Cần cập nhật câu SQL để thêm cột ImageUrl nếu bạn muốn thêm ảnh ngay khi tạo user
-        String sql = "INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive, ImageUrl) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?)"; // Thêm ImageUrl vào VALUES
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive, ImageUrl) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)"; // Thêm ImageUrl vào VALUES
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getPassword()); // Cần hash password ở đây
             stmt.setString(3, user.getFullName());
@@ -69,11 +65,10 @@ public class UserDAO {
         return false;
     }
 
-     public boolean updateUser(User user) {
+    public boolean updateUser(User user) {
         // Cần cập nhật câu SQL để cho phép sửa ImageUrl nếu muốn
         String sql = "UPDATE Users SET FullName = ?, PhoneNumber = ?, ImageUrl = ?, UpdatedAt = GETDATE() WHERE UserID = ?"; // Thêm ImageUrl = ?
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getPhoneNumber());
             stmt.setString(3, user.getImageUrl()); // Thêm ImageUrl
@@ -87,9 +82,8 @@ public class UserDAO {
     }
 
     public boolean updatePassword(int userId, String newPassword) {
-         String sql = "UPDATE Users SET Password = ?, UpdatedAt = GETDATE() WHERE UserID = ?";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "UPDATE Users SET Password = ?, UpdatedAt = GETDATE() WHERE UserID = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, newPassword); // Cần hash password mới
             stmt.setInt(2, userId);
             return stmt.executeUpdate() > 0;
@@ -99,10 +93,9 @@ public class UserDAO {
         return false;
     }
 
-     public boolean updateLastLogin(int userId) {
+    public boolean updateLastLogin(int userId) {
         String sql = "UPDATE Users SET LastLogin = GETDATE() WHERE UserID = ?";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -114,8 +107,7 @@ public class UserDAO {
     public List<User> findByRole(String role) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM Users WHERE Role = ? AND IsActive = 1";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, role);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -130,8 +122,7 @@ public class UserDAO {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM Users ORDER BY CreatedAt DESC";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 users.add(extractUserFromResultSet(rs));
@@ -142,10 +133,9 @@ public class UserDAO {
         return users;
     }
 
-     public boolean deactivateUser(int userId) {
+    public boolean deactivateUser(int userId) {
         String sql = "UPDATE Users SET IsActive = 0, UpdatedAt = GETDATE() WHERE UserID = ?";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -153,7 +143,6 @@ public class UserDAO {
         }
         return false;
     }
-
 
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
@@ -166,16 +155,37 @@ public class UserDAO {
         user.setActive(rs.getBoolean("IsActive"));
 
         Timestamp createdAt = rs.getTimestamp("CreatedAt");
-        if (createdAt != null) user.setCreatedAt(createdAt.toLocalDateTime());
+        if (createdAt != null) {
+            user.setCreatedAt(createdAt.toLocalDateTime());
+        }
 
         Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
-        if (updatedAt != null) user.setUpdatedAt(updatedAt.toLocalDateTime());
+        if (updatedAt != null) {
+            user.setUpdatedAt(updatedAt.toLocalDateTime());
+        }
 
         Timestamp lastLogin = rs.getTimestamp("LastLogin");
-        if (lastLogin != null) user.setLastLogin(lastLogin.toLocalDateTime());
+        if (lastLogin != null) {
+            user.setLastLogin(lastLogin.toLocalDateTime());
+        }
 
         user.setImageUrl(rs.getString("ImageUrl")); // <<<===== THÊM DÒNG NÀY
 
         return user;
+    }
+
+    public boolean updateImageUrl(int userId, String imageUrl) {
+        String sql = "UPDATE Users SET ImageUrl = ?, UpdatedAt = GETDATE() WHERE UserID = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, imageUrl);
+            stmt.setInt(2, userId);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
