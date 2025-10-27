@@ -93,7 +93,7 @@ public class UserDAO {
         return false;
     }
 
-    public boolean updateLastLogin(int userId) {
+     public boolean updateLastLogin(int userId) {
         String sql = "UPDATE Users SET LastLogin = GETDATE() WHERE UserID = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
@@ -133,7 +133,7 @@ public class UserDAO {
         return users;
     }
 
-    public boolean deactivateUser(int userId) {
+     public boolean deactivateUser(int userId) {
         String sql = "UPDATE Users SET IsActive = 0, UpdatedAt = GETDATE() WHERE UserID = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
@@ -143,6 +143,7 @@ public class UserDAO {
         }
         return false;
     }
+
 
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
