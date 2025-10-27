@@ -89,6 +89,12 @@
                     </a>
                 </li>
                 <li class="sidebar-menu-item">
+                    <a href="${pageContext.request.contextPath}/medical/vaccination-record/" class="sidebar-menu-link">
+                        <i class="bi bi-syringe"></i>
+                        <span>Ghi nhận tiêm chủng</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
                     <a href="${pageContext.request.contextPath}/medical/vaccinations" class="sidebar-menu-link">
                         <i class="bi bi-syringe"></i>
                         <span>Quản lý Vắc xin</span>
