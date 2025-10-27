@@ -105,6 +105,75 @@
                 <div class="content-card fade-in-up">
                     <div class="content-card-header">
                         <h3 class="content-card-title">
+                            <i class="bi bi-camera-fill"></i>
+                            Ảnh đại diện
+                        </h3>
+                    </div>
+                    <div class="content-card-body">
+                        <c:if test="${not empty successAvatar}">
+                            <div class="alert-modern fade-in-up" style="background: linear-gradient(135deg, rgba(72, 199, 116, 0.1) 0%, rgba(92, 200, 190, 0.1) 100%); border-left: 4px solid #48C774; margin-bottom: 1.5rem;">
+                                <i class="bi bi-check-circle-fill" style="color: #48C774; font-size: 1.5rem;"></i>
+                                <div>
+                                    <strong>Thành công!</strong><br>
+                                    ${successAvatar}
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${not empty errorAvatar}">
+                            <div class="alert-modern alert-info-modern fade-in-up" style="background: linear-gradient(135deg, rgba(241, 70, 104, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%); border-left-color: #F14668; margin-bottom: 1.5rem;">
+                                <i class="bi bi-exclamation-triangle-fill" style="color: #F14668;"></i>
+                                <div>
+                                    <strong>Lỗi!</strong><br>
+                                    ${errorAvatar}
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <div style="display: flex; align-items: center; gap: 2rem;">
+                            <div style="position: relative;">
+                                <c:choose>
+                                    <c:when test="${not empty user.imageUrl}">
+                                        <img id="avatarPreview" src="${user.imageUrl}" alt="Avatar" 
+                                             style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); box-shadow: var(--shadow-md);">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div id="avatarPreview" style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; border: 4px solid var(--primary-color); box-shadow: var(--shadow-md);">
+                                            <i class="bi bi-person-fill" style="font-size: 4rem; color: white;"></i>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+
+                            <div style="flex: 1;">
+                                <form method="post" action="${pageContext.request.contextPath}/parent/profile" enctype="multipart/form-data">
+                                    <input type="hidden" name="action" value="uploadAvatar">
+                                    
+                                    <div>
+                                        <label for="avatar" style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-dark);">
+                                            <i class="bi bi-upload"></i> Tải lên ảnh mới
+                                        </label>
+                                        <input type="file" id="avatar" name="avatar" class="form-input-modern" 
+                                               accept="image/jpeg,image/jpg,image/png,image/gif" onchange="previewImage(event)">
+                                        <small style="color: var(--text-light); font-size: 0.85rem; display: block; margin-top: 0.3rem;">
+                                            Chấp nhận: JPG, JPEG, PNG, GIF. Kích thước tối đa: 10MB
+                                        </small>
+                                    </div>
+
+                                    <div style="padding-top: 1rem;">
+                                        <button type="submit" class="btn-modern btn-primary-modern">
+                                            <i class="bi bi-upload"></i> Cập nhật ảnh
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card fade-in-up" style="margin-top: 1.5rem;">
+                    <div class="content-card-header">
+                        <h3 class="content-card-title">
                             <i class="bi bi-person-badge-fill"></i>
                             Thông tin cá nhân
                         </h3>
@@ -227,5 +296,28 @@
             </main>
         </div>
     </div>
+
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('avatarPreview');
+                    if (preview.tagName === 'IMG') {
+                        preview.src = e.target.result;
+                    } else {
+                        const img = document.createElement('img');
+                        img.id = 'avatarPreview';
+                        img.src = e.target.result;
+                        img.alt = 'Avatar Preview';
+                        img.style.cssText = 'width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); box-shadow: var(--shadow-md);';
+                        preview.parentNode.replaceChild(img, preview);
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
 </body>
 </html>
