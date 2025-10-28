@@ -138,4 +138,33 @@ public class VaccinationRecordDAO {
         
         return record;
     }
+    
+    public boolean updateRecord(VaccinationRecord record) {
+        String sql = "UPDATE VaccinationRecords SET " +
+                "SideEffectsReported = ?, " +
+                "HealthCheckNotes = ?, " +
+                "VaccinationNotes = ?, " +
+                "NextDoseDate = ? " +
+                "WHERE RecordID = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, record.getSideEffectsReported());
+            stmt.setString(2, record.getHealthCheckNotes());
+            stmt.setString(3, record.getVaccinationNotes());
+
+            if (record.getNextDoseDate() != null) {
+                stmt.setDate(4, java.sql.Date.valueOf(record.getNextDoseDate()));
+            } else {
+                stmt.setNull(4, java.sql.Types.DATE);
+            }
+
+            stmt.setInt(5, record.getRecordId());
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

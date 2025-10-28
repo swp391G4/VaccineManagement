@@ -7,6 +7,7 @@
 <head>
     <title>Appointment Detail</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/appointment-style.css">
 </head>
 <body class="container mt-4">
     <h2>Appointment Detail</h2>

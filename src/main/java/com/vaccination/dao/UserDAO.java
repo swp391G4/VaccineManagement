@@ -2,10 +2,12 @@ package com.vaccination.dao;
 
 import com.vaccination.model.User;
 import com.vaccination.util.DatabaseConnection;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserDAO {
 
@@ -187,5 +189,205 @@ public class UserDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+     //admin merge
+    /**
+     * Get paginated users with optional role filter
+     * @param page page number (1-based)
+     * @param size items per page
+     * @param roleFilter filter by role (null = all)
+     * @return List of users as Map (for JSP compatibility)
+     */
+    public List<Map<String, Object>> getUsers(int page, int size, String roleFilter) throws SQLException {
+        List<Map<String, Object>> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users WHERE Role != 'GUEST'";
+        
+        if (roleFilter != null && !roleFilter.isEmpty()) {
+            sql += " AND Role = ?";
+        }
+        sql += " ORDER BY UserID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            int paramIndex = 1;
+            if (roleFilter != null && !roleFilter.isEmpty()) {
+                ps.setString(paramIndex++, roleFilter);
+            }
+            ps.setInt(paramIndex++, (page - 1) * size);
+            ps.setInt(paramIndex, size);
+            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> user = new HashMap<>();
+                user.put("UserID", rs.getInt("UserID"));
+                user.put("Email", rs.getString("Email"));
+                user.put("FullName", rs.getString("FullName"));
+                user.put("PhoneNumber", rs.getString("PhoneNumber"));
+                user.put("Role", rs.getString("Role"));
+                user.put("IsActive", rs.getBoolean("IsActive"));
+                user.put("CreatedAt", rs.getTimestamp("CreatedAt"));
+                user.put("LastLogin", rs.getTimestamp("LastLogin"));
+                users.add(user);
+            }
+        }
+        return users;
+    }
+
+    /**
+     * Get total count of users for pagination
+     * @param roleFilter filter by role (null = all)
+     * @return total count
+     */
+    public int getTotalUsers(String roleFilter) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Users WHERE Role != 'GUEST'";
+        
+        if (roleFilter != null && !roleFilter.isEmpty()) {
+            sql += " AND Role = ?";
+        }
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            if (roleFilter != null && !roleFilter.isEmpty()) {
+                ps.setString(1, roleFilter);
+            }
+            
+            ResultSet rs = ps.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+    
+     /**
+     * Create user with role validation (Admin function)
+     * Uses PLAIN TEXT password
+     * @return true if successful
+     */
+    public boolean createUserWithRole(String email, String password, String fullName, 
+                                      String phone, String role) throws SQLException {
+        // Validate role
+        if (!Arrays.asList("ADMIN", "RECEPTION", "MEDICAL", "PARENT").contains(role)) {
+            return false;
+        }
+        
+        // Plain text password (NO BCrypt)
+        String sql = "INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive) " +
+                     "VALUES (?, ?, ?, ?, ?, 1)";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, email);
+            ps.setString(2, password); // Plain text
+            ps.setString(3, fullName);
+            ps.setString(4, phone);
+            ps.setString(5, role);
+            
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Get user by ID as Map (for Admin JSP)
+     * @param id user ID
+     * @return user data as Map
+     */
+    public Map<String, Object> getUserById(int id) throws SQLException {
+        String sql = "SELECT * FROM Users WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                Map<String, Object> user = new HashMap<>();
+                user.put("UserID", rs.getInt("UserID"));
+                user.put("Email", rs.getString("Email"));
+                user.put("FullName", rs.getString("FullName"));
+                user.put("PhoneNumber", rs.getString("PhoneNumber"));
+                user.put("Role", rs.getString("Role"));
+                user.put("IsActive", rs.getBoolean("IsActive"));
+                user.put("CreatedAt", rs.getTimestamp("CreatedAt"));
+                user.put("LastLogin", rs.getTimestamp("LastLogin"));
+                return user;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Update user info (Admin function)
+     * @param id user ID
+     * @param fullName new full name
+     * @param phone new phone
+     * @param role new role
+     * @return true if successful
+     */
+    public boolean updateUserByAdmin(int id, String fullName, String phone, String role) throws SQLException {
+        String sql = "UPDATE Users SET FullName = ?, PhoneNumber = ?, Role = ? WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, fullName);
+            ps.setString(2, phone);
+            ps.setString(3, role);
+            ps.setInt(4, id);
+            
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Toggle user active/inactive status
+     * @param id user ID
+     * @param active new status
+     * @return true if successful
+     */
+    public boolean toggleActive(int id, boolean active) throws SQLException {
+        String sql = "UPDATE Users SET IsActive = ? WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setBoolean(1, active);
+            ps.setInt(2, id);
+            
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Reset password to random value
+     * Returns the new password (plain text)
+     * @param id user ID
+     * @return new password or null if failed
+     */
+    public String resetPassword(int id) throws SQLException {
+        String newPass = generateRandomPassword();
+        String sql = "UPDATE Users SET Password = ? WHERE UserID = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, newPass); // Plain text
+            ps.setInt(2, id);
+            
+            if (ps.executeUpdate() > 0) {
+                return newPass;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Generate random password
+     * @return random password string
+     */
+    private String generateRandomPassword() {
+        return "Pass" + (int)(Math.random() * 1000000);
     }
 }
