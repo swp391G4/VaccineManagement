@@ -162,16 +162,7 @@
                         </div>
 
                         <!-- Batch Number -->
-                        <div class="mb-4">
-                            <label for="batchNumber" class="form-label">
-                                <i class="bi bi-box-seam"></i> Số lô (Batch Number)
-                            </label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="batchNumber"
-                                   name="batchNumber"
-                                   placeholder="VD: LOT-A1">
-                        </div>
+
 
                         <!-- Dose Number -->
                         <div class="mb-4">

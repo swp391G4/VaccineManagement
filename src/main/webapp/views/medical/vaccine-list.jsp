@@ -174,6 +174,10 @@
                 <button class="filter-tab" onclick="filterVaccines('PAID')">
                     <i class="bi bi-currency-dollar"></i> Có phí
                 </button>
+
+                <button type="button" id="btnAddVaccine" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vaccineAddModal">
+                    Thêm vắc xin
+                </button>
             </div>
 
             <!-- VACCINES LIST -->
@@ -309,14 +313,7 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="vaccineEditContent">
-                <div class="text-center py-5">
-                    <div class="spinner-border text-success" role="status">
-                        <span class="visually-hidden">Đang tải...</span>
-                    </div>
-                    <p class="mt-3 text-muted">Đang tải form chỉnh sửa...</p>
-                </div>
-            </div>
+            <div class="modal-body" id="vaccineEditContent"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle"></i> Hủy
@@ -325,6 +322,88 @@
                     <i class="bi bi-check-circle"></i> Xác nhận
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Vaccine Add (độc lập) -->
+<div class="modal fade" id="vaccineAddModal" tabindex="-1" aria-labelledby="vaccineAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); color: white;">
+                <h5 class="modal-title" id="vaccineAddModalLabel">
+                    <i class="bi bi-plus-circle"></i> Thêm Vắc xin
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="vaccineAddForm" method="post"
+                  action="${pageContext.request.contextPath}/medical/vaccinations/create">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên Vắc xin <span class="text-danger">*</span></label>
+                            <input name="vaccineName" type="text" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nhà sản xuất</label>
+                            <input name="manufacturer" type="text" class="form-control">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea name="description" class="form-control" rows="2"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Bệnh phòng ngừa</label>
+                            <input name="diseasesPrevented" type="text" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Lịch tiêm</label>
+                            <input name="dosageSchedule" type="text" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Độ tuổi khuyến cáo</label>
+                            <input name="recommendedAge" type="text" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ảnh (URL)</label>
+                            <input name="imageUrl" type="url" class="form-control" placeholder="https://...">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Giá (VND)</label>
+                            <input id="addPrice" name="price" type="number" min="0" step="100" class="form-control">
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check">
+                                <input id="addIsFree" name="isFree" type="checkbox" class="form-check-input">
+                                <label class="form-check-label" for="addIsFree">Miễn phí</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Tác dụng phụ</label>
+                            <textarea name="sideEffects" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Chống chỉ định</label>
+                            <textarea name="contraindications" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Hủy
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Lưu
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -388,22 +467,14 @@
 
     // Edit vaccine - show edit form in modal
     function editVaccine(vaccineId) {
-        const modal = new bootstrap.Modal(document.getElementById('vaccineEditModal'));
+        const modalEl = document.getElementById('vaccineEditModal');
+        const modal = new bootstrap.Modal(modalEl);
         const contentDiv = document.getElementById('vaccineEditContent');
 
-        // Show loading
-        contentDiv.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-success" role="status">
-                    <span class="visually-hidden">Đang tải...</span>
-                </div>
-                <p class="mt-3 text-muted">Đang tải form chỉnh sửa...</p>
-            </div>
-        `;
+        // Clear trước
+        contentDiv.innerHTML = '';
 
-        modal.show();
-
-        // Fetch vaccine edit form
+        // Lấy form rồi mới show modal
         fetch('${pageContext.request.contextPath}/medical/vaccinations/edit/' + vaccineId)
             .then(response => {
                 if (!response.ok) {
@@ -413,16 +484,20 @@
             })
             .then(html => {
                 contentDiv.innerHTML = html;
+                modal.show();
             })
             .catch(error => {
+                // Chỉ show modal khi cần báo lỗi
                 contentDiv.innerHTML = `
-                    <div class="alert alert-danger m-4">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                        <strong>Lỗi!</strong> ${error.message}
-                    </div>
-                `;
+                <div class="alert alert-danger m-4">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Lỗi!</strong> ${error.message}
+                </div>
+            `;
+                modal.show();
             });
     }
+
 
     // Submit vaccine edit form
     function submitVaccineEdit() {
@@ -446,6 +521,32 @@
             form.submit();
         }
     }
+
+    // === Modal Add: reset form & disable Giá khi tick Miễn phí ===
+    document.getElementById('vaccineAddModal')?.addEventListener('show.bs.modal', function () {
+        const form = document.getElementById('vaccineAddForm');
+        if (!form) return;
+        form.reset();
+        const price = document.getElementById('addPrice');
+        const isFree = document.getElementById('addIsFree');
+        function syncPrice() {
+            if (!price) return;
+            if (isFree && isFree.checked) {
+                price.value = '';
+                price.setAttribute('disabled', 'disabled');
+            } else {
+                price.removeAttribute('disabled');
+            }
+        }
+        if (isFree) {
+            isFree.removeEventListener('change', syncPrice); // tránh double-bind khi mở nhiều lần
+            isFree.addEventListener('change', syncPrice);
+        }
+        syncPrice();
+    });
+
+
+
 </script>
 </body>
 </html>

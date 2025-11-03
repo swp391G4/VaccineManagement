@@ -51,7 +51,10 @@ public class VaccineManageServlet extends HttpServlet {
         } else if (pathInfo.startsWith("/edit/")) {
             // Get vaccine edit form (for AJAX request)
             getVaccineEditForm(request, response);
-        } else {
+        } else if ("/add".equals(pathInfo) || pathInfo.startsWith("/add")) {
+            // Get vaccine edit form (for AJAX request)
+            request.getRequestDispatcher("/views/medical/vaccine-add.jsp").forward(request, response);
+        }else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
@@ -121,6 +124,64 @@ public class VaccineManageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
+        request.setCharacterEncoding("UTF-8");
+
+        if ("/create".equals(pathInfo) || pathInfo.startsWith("/create")) {
+            // LẤY CÙNG BỘ FIELD NHƯ EDIT
+            String vaccineName       = request.getParameter("vaccineName");
+            String manufacturer      = request.getParameter("manufacturer");
+            String description       = request.getParameter("description");
+            String diseasesPrevented = request.getParameter("diseasesPrevented");
+            String dosageSchedule    = request.getParameter("dosageSchedule");
+            String recommendedAge    = request.getParameter("recommendedAge");
+            String priceStr          = request.getParameter("price");
+            String isFreeStr         = request.getParameter("isFree");
+            String sideEffects       = request.getParameter("sideEffects");
+            String contraindications = request.getParameter("contraindications");
+            String imageUrl          = request.getParameter("imageUrl");
+
+            // Parse giá
+            BigDecimal price = BigDecimal.ZERO;
+            try {
+                if (priceStr != null && !priceStr.trim().isEmpty()) {
+                    price = new BigDecimal(priceStr.trim());
+                }
+            } catch (NumberFormatException ex) {
+                request.setAttribute("error", "Giá không hợp lệ");
+                // Vì bạn đang dùng modal trên cùng trang list ⇒ quay về list kèm error qua query string
+                response.sendRedirect(request.getContextPath() + "/medical/vaccinations/list?error=invalid_price");
+                return;
+            }
+
+            // Miễn phí ⇒ giá = 0
+            boolean isFree = "on".equalsIgnoreCase(isFreeStr) || "true".equalsIgnoreCase(isFreeStr);
+            if (isFree) price = BigDecimal.ZERO;
+
+            // GÁN vào model Vaccine
+            Vaccine v = new Vaccine();
+            v.setVaccineName(vaccineName);
+            v.setManufacturer(manufacturer);
+            v.setDescription(description);
+            v.setDiseasesPrevented(diseasesPrevented);
+            v.setDosageSchedule(dosageSchedule);
+            v.setRecommendedAge(recommendedAge);
+            v.setPrice(price);
+            v.setFree(isFree);
+            v.setActive(true); // thêm mới → mặc định kích hoạt
+            v.setSideEffects(sideEffects);
+            v.setContraindications(contraindications);
+            v.setImageUrl(imageUrl);
+
+            boolean ok = vaccineDAO.createVaccine(v); // DÙNG method đã có, đầy đủ fields
+
+            if (ok) {
+                response.sendRedirect(request.getContextPath() + "/medical/vaccinations/list?success=created");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/medical/vaccinations/list?error=create_failed");
+            }
+            return;
+        }
+
 
         if (pathInfo != null && pathInfo.startsWith("/hide/")) {
             // Handle hide vaccine action

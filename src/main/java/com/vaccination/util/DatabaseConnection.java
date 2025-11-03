@@ -54,7 +54,12 @@ public class DatabaseConnection {
     }
 
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        try {
+            return DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            System.err.println("Cannot connect DB. URL="+url+" USER="+username+" ERROR="+e.getMessage());
+            throw e;
+        }
     }
 
     public void closeConnection(Connection conn) {
