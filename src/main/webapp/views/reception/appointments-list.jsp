@@ -8,8 +8,8 @@
 <head>
     <title>Manage Appointments - Reception</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/manage-appointments.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/appointment-style.css">
+
 </head>
 <body class="container mt-4">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -25,7 +25,7 @@
                         </span>
                     </li>
                     <li class="nav-item">
-                        <a class="btn-logout" href="${pageContext.request.contextPath}/logout">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/logout">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
                     </li>
@@ -67,7 +67,7 @@
                     <% if ("PENDING".equals(status)) { %>
                         <form action="<%= request.getContextPath() %>/reception/confirmAppointment" method="post" style="display:inline;">
                             <input type="hidden" name="appointmentId" value="<%= app.getAppointmentId() %>">
-                            <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+<button type="submit" class="btn btn-success btn-sm">Confirm</button>
                         </form>
                         <form action="<%= request.getContextPath() %>/reception/cancelAppointment" method="post" style="display:inline;">
                             <input type="hidden" name="appointmentId" value="<%= app.getAppointmentId() %>">

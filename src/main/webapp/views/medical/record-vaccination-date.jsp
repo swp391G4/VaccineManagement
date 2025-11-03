@@ -133,12 +133,6 @@
                                    id="vaccinationDateTime"
                                    name="vaccinationDateTime"
                                    required>
-                            <!-- hiển thị lỗi màu đỏ tại chỗ -->
-                            <small id="vaccinationDateTimeError"
-                                   class="text-danger"
-                                   style="display: ${param.error == 'datetime_future' ? 'block' : 'none'};">
-                                Thời điểm tiêm không được sau thời điểm hiện tại.
-                            </small>
                             <small class="form-text text-muted">Mặc định là thời điểm hiện tại. Có thể điều chỉnh nếu cần.</small>
                         </div>
 

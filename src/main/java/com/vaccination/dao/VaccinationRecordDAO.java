@@ -138,7 +138,7 @@ public class VaccinationRecordDAO {
         
         return record;
     }
-
+    
     public boolean updateRecord(VaccinationRecord record) {
         String sql = "UPDATE VaccinationRecords SET " +
                 "SideEffectsReported = ?, " +

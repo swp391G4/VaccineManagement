@@ -103,7 +103,7 @@ public class AppointmentManagementServlet extends HttpServlet {
         }
 
         request.setAttribute("appointments", allAppointments);
-        request.getRequestDispatcher("/views/parent/appointments-confirmed-list.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/parent/appointments-list.jsp").forward(request, response);
     }
 
     private void viewAppointmentDetail(HttpServletRequest request, HttpServletResponse response, User user, int appointmentId)

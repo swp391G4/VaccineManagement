@@ -77,6 +77,12 @@
         <aside class="sidebar">
             <ul class="sidebar-menu">
                 <li class="sidebar-menu-item">
+                    <a href="${pageContext.request.contextPath}/medical/dashboard" class="sidebar-menu-link">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
                     <a href="${pageContext.request.contextPath}/medical/appointments/" class="sidebar-menu-link active">
                         <i class="bi bi-calendar-check"></i>
                         <span>Danh sách lịch hẹn</span>

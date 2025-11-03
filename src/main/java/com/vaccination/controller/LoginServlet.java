@@ -60,8 +60,7 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/reception/appointments-list");
                     break;
                 case "MEDICAL":
-                    System.out.println("Redirecting to: /medical/appointments");
-                    response.sendRedirect(request.getContextPath() + "/medical/appointments");
+                    response.sendRedirect(request.getContextPath() + "/medical/vaccinations");
                     break;
                 case "PARENT":
                     response.sendRedirect(request.getContextPath() + "/parent/dashboard");
@@ -72,7 +71,7 @@ public class LoginServlet extends HttpServlet {
             }
         } else {
             request.setAttribute("error", "Invalid email or password");
-            request.getRequestDispatcher("/views/guest/login.jsp").forward(request, response);
+request.getRequestDispatcher("/views/guest/login.jsp").forward(request, response);
         }
     }
 }
