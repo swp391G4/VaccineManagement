@@ -39,7 +39,8 @@
                 </c:forEach>
             </tbody>
         </table>
-        <a href="/admin/users/list" class="btn btn-secondary">Manage Users</a>
+        
+        <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-secondary">Manage Users</a>
     </div>
 </body>
 </html>

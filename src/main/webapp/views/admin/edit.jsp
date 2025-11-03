@@ -11,7 +11,8 @@
         <c:if test="${not empty error}">
             <div class="alert alert-danger">${error}</div>
         </c:if>
-        <form action="/admin/users/edit" method="post">
+        
+        <form action="${pageContext.request.contextPath}/admin/users/edit" method="post">
             <input type="hidden" name="id" value="${user.UserID}">
             <div class="form-group">
                 <label>Full Name</label>
@@ -31,7 +32,8 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
-            <a href="/admin/users/list" class="btn btn-secondary">Cancel</a>
+            
+            <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </body>

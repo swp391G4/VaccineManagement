@@ -11,7 +11,8 @@
         <c:if test="${not empty error}">
             <div class="alert alert-danger">${error}</div>
         </c:if>
-        <form action="/admin/users/create" method="post">
+        
+        <form action="${pageContext.request.contextPath}/admin/users/create" method="post">
             <div class="form-group">
                 <label>Email</label>
                 <input name="email" class="form-control" required>
@@ -38,7 +39,8 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Create</button>
-            <a href="/admin/users/list" class="btn btn-secondary">Cancel</a>
+            
+            <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </body>

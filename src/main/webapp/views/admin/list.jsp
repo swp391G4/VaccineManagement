@@ -8,14 +8,16 @@
 <body>
     <div class="container">
         <h2>User List</h2>
-        <a href="/admin/users/create" class="btn btn-primary mb-3">Create New User</a>
+        
+        <a href="${pageContext.request.contextPath}/admin/users/create" class="btn btn-primary mb-3">Create New User</a>
         <c:if test="${not empty message}">
             <div class="alert alert-success">${message}</div>
         </c:if>
         <c:if test="${not empty error}">
             <div class="alert alert-danger">${error}</div>
         </c:if>
-        <form action="/admin/users/list" method="get" class="mb-3">
+        
+        <form action="${pageContext.request.contextPath}/admin/users" method="get" class="mb-3">
             <select name="role" class="form-control d-inline w-auto">
                 <option value="">All Roles</option>
                 <option value="ADMIN" <c:if test="${roleFilter == 'ADMIN'}">selected</c:if>>ADMIN</option>
@@ -40,14 +42,18 @@
                         <td>${user.IsActive ? 'Yes' : 'No'}</td>
                         <td>${user.CreatedAt}</td>
                         <td>
-                            <a href="/admin/users/view?id=${user.UserID}" class="btn btn-sm btn-info">View</a>
-                            <a href="/admin/users/edit?id=${user.UserID}" class="btn btn-sm btn-warning">Edit</a>
-                            <form action="/admin/users/toggle" method="post" style="display:inline;">
+                            
+                            <a href="${pageContext.request.contextPath}/admin/users/view?id=${user.UserID}" class="btn btn-sm btn-info">View</a>
+                            
+                            <a href="${pageContext.request.contextPath}/admin/users/edit?id=${user.UserID}" class="btn btn-sm btn-warning">Edit</a>
+                            
+                            <form action="${pageContext.request.contextPath}/admin/users/toggle" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="${user.UserID}">
                                 <input type="hidden" name="active" value="${!user.IsActive}">
                                 <button type="submit" class="btn btn-sm btn-${user.IsActive ? 'danger' : 'success'}">${user.IsActive ? 'Deactivate' : 'Activate'}</button>
                             </form>
-                            <form action="/admin/users/reset" method="post" style="display:inline;">
+                            
+                            <form action="${pageContext.request.contextPath}/admin/users/reset" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="${user.UserID}">
                                 <button type="submit" class="btn btn-sm btn-secondary">Reset Password</button>
                             </form>
@@ -60,7 +66,8 @@
             <ul class="pagination">
                 <c:forEach begin="1" end="${totalPages}" var="i">
                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                        <a class="page-link" href="/admin/users/list?page=${i}&role=${roleFilter}">${i}</a>
+                        
+                        <a class="page-link" href="${pageContext.request.contextPath}/admin/users?page=${i}&role=${roleFilter}">${i}</a>
                     </li>
                 </c:forEach>
             </ul>

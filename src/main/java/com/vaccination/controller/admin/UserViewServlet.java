@@ -25,7 +25,8 @@ public class UserViewServlet extends HttpServlet {
 
         try {
             request.setAttribute("user", userDAO.getUserById(id));
-            request.getRequestDispatcher("/views/admin/users/view.jsp").forward(request, response);
+            // ✅ FIXED: Changed from /views/admin/users/view.jsp
+            request.getRequestDispatcher("/views/admin/view.jsp").forward(request, response);
             
         } catch (SQLException e) {
             e.printStackTrace();

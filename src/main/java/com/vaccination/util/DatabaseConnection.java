@@ -23,8 +23,8 @@ public class DatabaseConnection {
                 System.out.println("Unable to find database.properties, using defaults");
                 this.driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
                 this.url = "jdbc:sqlserver://localhost:1433;databaseName=VaccinationDB";
-                this.username = "sa";
-                this.password = "123456";
+                this.username = "dodt";
+                this.password = "123456789";
             } else {
                 props.load(input);
                 this.driver = props.getProperty("db.driver");

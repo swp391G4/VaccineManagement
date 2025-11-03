@@ -25,7 +25,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
@@ -60,8 +60,7 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/reception/appointments-list");
                     break;
                 case "MEDICAL":
-                    System.out.println("Redirecting to: /medical/appointments");
-                    response.sendRedirect(request.getContextPath() + "/medical/appointments");
+                    response.sendRedirect(request.getContextPath() + "/medical/vaccinations");
                     break;
                 case "PARENT":
                     response.sendRedirect(request.getContextPath() + "/parent/dashboard");

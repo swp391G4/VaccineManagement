@@ -16,7 +16,8 @@
         <p><strong>Active:</strong> ${user.IsActive ? 'Yes' : 'No'}</p>
         <p><strong>Created At:</strong> ${user.CreatedAt}</p>
         <p><strong>Last Login:</strong> ${user.LastLogin}</p>
-        <a href="/admin/users/list" class="btn btn-secondary">Back to List</a>
+        
+        <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-secondary">Back to List</a>
     </div>
 </body>
 </html>
