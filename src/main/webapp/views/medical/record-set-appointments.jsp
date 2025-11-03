@@ -16,7 +16,7 @@
 <nav class="dashboard-navbar">
     <div class="dashboard-container">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <a href="${pageContext.request.contextPath}/medical/dashboard" class="navbar-brand-custom">
+            <a href="${pageContext.request.contextPath}/medical/vaccinations" class="navbar-brand-custom">
                 <i class="bi bi-heart-pulse-fill"></i>
                 <span>Vaccine For Kids - Medical</span>
             </a>
@@ -40,12 +40,6 @@
         <!-- SIDEBAR MENU -->
         <aside class="sidebar slide-in-left">
             <ul class="sidebar-menu">
-                <li class="sidebar-menu-item">
-                    <a href="${pageContext.request.contextPath}/medical/dashboard" class="sidebar-menu-link">
-                        <i class="bi bi-speedometer2"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
                 <li class="sidebar-menu-item">
                     <a href="${pageContext.request.contextPath}/medical/appointments/" class="sidebar-menu-link">
                         <i class="bi bi-calendar-check"></i>

@@ -10,7 +10,12 @@ import java.util.List;
 public class AppointmentDAO {
     
     public Appointment findById(int appointmentId) {
-        String sql = "SELECT * FROM Appointments WHERE AppointmentID = ?";
+        String sql =
+                "SELECT a.*, c.FullName AS ChildName, v.VaccineName AS VaccineName " +
+                        "FROM Appointments a " +
+                        "LEFT JOIN Children c ON a.ChildID = c.ChildID " +
+                        "LEFT JOIN Vaccines v ON a.VaccineID = v.VaccineID " +
+                        "WHERE a.AppointmentID = ?";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -29,7 +34,13 @@ public class AppointmentDAO {
 
     public List<Appointment> findByChildId(int childId) {
         List<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT * FROM Appointments WHERE ChildID = ? ORDER BY AppointmentDate DESC, AppointmentTime DESC";
+        String sql =
+                "SELECT a.*, c.FullName AS ChildName, v.VaccineName AS VaccineName " +
+                        "FROM Appointments a " +
+                        "LEFT JOIN Children c ON a.ChildID = c.ChildID " +
+                        "LEFT JOIN Vaccines v ON a.VaccineID = v.VaccineID " +
+                        "WHERE a.ChildID = ? " +
+                        "ORDER BY a.AppointmentDate DESC, a.AppointmentTime DESC";
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -48,8 +59,15 @@ public class AppointmentDAO {
 
     public List<Appointment> findByStatus(String status) {
         List<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT * FROM Appointments WHERE Status = ? ORDER BY AppointmentDate, AppointmentTime";
-        
+        String sql =
+                "SELECT a.*, c.FullName AS ChildName, v.VaccineName AS VaccineName " +
+                        "FROM Appointments a " +
+                        "LEFT JOIN Children c ON a.ChildID = c.ChildID " +
+                        "LEFT JOIN Vaccines v ON a.VaccineID = v.VaccineID " +
+                        "WHERE a.Status = ? " +
+                        "ORDER BY a.AppointmentDate, a.AppointmentTime";
+
+
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
@@ -67,8 +85,15 @@ public class AppointmentDAO {
 
     public List<Appointment> findByCenterId(int centerId) {
         List<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT * FROM Appointments WHERE CenterID = ? ORDER BY AppointmentDate DESC, AppointmentTime DESC";
-        
+        String sql =
+                "SELECT a.*, c.FullName AS ChildName, v.VaccineName AS VaccineName " +
+                        "FROM Appointments a " +
+                        "LEFT JOIN Children c ON a.ChildID = c.ChildID " +
+                        "LEFT JOIN Vaccines v ON a.VaccineID = v.VaccineID " +
+                        "WHERE a.CenterID = ? " +
+                        "ORDER BY a.AppointmentDate DESC, a.AppointmentTime DESC";
+
+
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
@@ -181,8 +206,15 @@ public class AppointmentDAO {
 
     public List<Appointment> findByCenterAndDate(int centerId, java.time.LocalDate date) {
         List<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT * FROM Appointments WHERE CenterID = ? AND AppointmentDate = ? AND Status != 'CANCELLED' ORDER BY AppointmentTime";
-        
+        String sql =
+                "SELECT a.*, c.FullName AS ChildName, v.VaccineName AS VaccineName " +
+                        "FROM Appointments a " +
+                        "LEFT JOIN Children c ON a.ChildID = c.ChildID " +
+                        "LEFT JOIN Vaccines v ON a.VaccineID = v.VaccineID " +
+                        "WHERE a.CenterID = ? AND a.AppointmentDate = ? AND a.Status <> 'CANCELLED' " +
+                        "ORDER BY a.AppointmentTime";
+
+
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
@@ -233,12 +265,24 @@ public class AppointmentDAO {
         
         Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
         if (updatedAt != null) appointment.setUpdatedAt(updatedAt.toLocalDateTime());
+
+        String cn = getIfHasColumn(rs, "ChildName");
+        if (cn != null) appointment.setChildName(cn);
+
+        String vn = getIfHasColumn(rs, "VaccineName");
+        if (vn != null) appointment.setVaccineName(vn);
         
         return appointment;
     }
     public List<Appointment> getAll() {
         List<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT * FROM Appointments ORDER BY AppointmentDate DESC, AppointmentTime DESC";
+        String sql =
+                "SELECT a.*, c.FullName AS ChildName, v.VaccineName AS VaccineName " +
+                        "FROM Appointments a " +
+                        "LEFT JOIN Children c ON a.ChildID = c.ChildID " +
+                        "LEFT JOIN Vaccines v ON a.VaccineID = v.VaccineID " +
+                        "ORDER BY a.AppointmentDate DESC, a.AppointmentTime DESC";
+
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -266,6 +310,9 @@ public class AppointmentDAO {
         }
     }
 
-
+    private String getIfHasColumn(ResultSet rs, String col) {
+        try { rs.findColumn(col); return rs.getString(col); }
+        catch (SQLException ignore) { return null; }
+    }
     
 }

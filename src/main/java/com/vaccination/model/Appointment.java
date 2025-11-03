@@ -25,6 +25,17 @@ public class Appointment {
     private Vaccine vaccine;
     private Center center;
 
+    // Appointment.java  (thêm các field + getter/setter)
+    private String childName;    // lấy từ Children.FullName
+    private String vaccineName;  // lấy từ Vaccines.VaccineName
+
+    public String getChildName() { return childName; }
+    public void setChildName(String childName) { this.childName = childName; }
+
+    public String getVaccineName() { return vaccineName; }
+    public void setVaccineName(String vaccineName) { this.vaccineName = vaccineName; }
+
+
     public Appointment() {
     }
 
