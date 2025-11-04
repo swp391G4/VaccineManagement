@@ -46,10 +46,6 @@ public class UserDAO {
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)"; // Thêm ImageUrl vào VALUES
         try (Connection conn = DatabaseConnection.getInstance().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
-            stmt.setString(2, hashPassword(user.getPassword()));
-            stmt.setString(3, user.getFullName());
-            stmt.setString(4, user.getPhoneNumber());
-            stmt.setString(5, user.getRole());
             stmt.setBoolean(6, user.isActive());
             stmt.setString(7, user.getImageUrl());
 

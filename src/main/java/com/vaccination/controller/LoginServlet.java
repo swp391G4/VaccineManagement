@@ -61,7 +61,8 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/reception/appointments-list");
                     break;
                 case "MEDICAL":
-                    response.sendRedirect(request.getContextPath() + "/medical/vaccinations");
+                    System.out.println("Redirecting to: /medical/appointments");
+                    response.sendRedirect(request.getContextPath() + "/medical/appointments");
                     break;
                 case "PARENT":
                     response.sendRedirect(request.getContextPath() + "/parent/dashboard");
