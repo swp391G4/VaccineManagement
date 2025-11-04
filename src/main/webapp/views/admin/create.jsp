@@ -121,7 +121,7 @@
                             <label for="name" class="mb-2 block text-sm font-medium text-gray-700">
                                 Full Name <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="name" name="name" required 
+                            <input type="text" id="fullName" name="fullName" required 
                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
                                    placeholder="Enter full name">
                         </div>
@@ -166,7 +166,7 @@
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                                     <i class="bi bi-telephone-fill text-gray-400"></i>
                                 </div>
-                                <input type="tel" id="phone" name="phone" required 
+                                <input type="tel" id="phoneNumber" name="phoneNumber" required 
                                        class="w-full rounded-lg border border-gray-300 pl-11 pr-4 py-3 text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
                                        placeholder="0123456789">
                             </div>
