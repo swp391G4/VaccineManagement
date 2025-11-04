@@ -9,11 +9,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import static com.vaccination.util.PasswordUtil.*;
 import java.io.IOException;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+
     private UserDAO userDAO = new UserDAO();
 
     @Override
@@ -25,7 +26,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
@@ -37,7 +38,7 @@ public class LoginServlet extends HttpServlet {
 
         User user = userDAO.findByEmail(email);
 
-        if (user != null && password.equals(user.getPassword())) {
+        if (user != null && verifyPassword(password, user.getPassword())) {
             if (!user.isActive()) {
                 request.setAttribute("error", "Your account has been deactivated");
                 request.getRequestDispatcher("/views/guest/login.jsp").forward(request, response);
@@ -71,6 +72,7 @@ public class LoginServlet extends HttpServlet {
                     break;
             }
         } else {
+            request.setAttribute("error", "Invalid email or password");
             request.setAttribute("error", "Invalid email or password");
             request.getRequestDispatcher("/views/guest/login.jsp").forward(request, response);
         }

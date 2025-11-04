@@ -9,11 +9,11 @@ public class User {
     private String fullName;
     private String phoneNumber;
     private String role;
-    private boolean isActive; // <<<--- GIỮ NGUYÊN TÊN BIẾN
+    private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLogin;
-    private String imageUrl; // <<<--- THÊM TRƯỜNG NÀY
+    private String imageUrl;
 
     public User() {
     }
@@ -24,10 +24,9 @@ public class User {
         this.fullName = fullName;
         this.phoneNumber = phoneNumber;
         this.role = role;
-        this.isActive = true; // Giữ nguyên
+        this.isActive = true;
     }
 
-    // --- Getters and Setters cũ (Giữ nguyên) ---
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
     public String getEmail() { return email; }
@@ -41,10 +40,8 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    // Getter cho boolean nên là "is" + TênBiếnViếtHoaChữĐầu
-    public boolean isActive() { return isActive; } // <<<--- GIỮ NGUYÊN PHƯƠNG THỨC GETTER
-    // Setter cho boolean nên là "set" + TênBiếnViếtHoaChữĐầu
-    public void setActive(boolean active) { isActive = active; } // <<<--- GIỮ NGUYÊN PHƯƠNG THỨC SETTER
+    public boolean isActive() { return isActive; } 
+    public void setActive(boolean active) { isActive = active; } 
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
@@ -53,14 +50,12 @@ public class User {
     public LocalDateTime getLastLogin() { return lastLogin; }
     public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }
 
-    // --- THÊM GETTER VÀ SETTER MỚI CHO imageUrl ---
     public String getImageUrl() {
         return imageUrl;
     }
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-    // --- KẾT THÚC PHẦN THÊM MỚI ---
 
     @Override
     public String toString() {

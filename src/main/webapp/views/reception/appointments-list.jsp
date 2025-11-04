@@ -67,7 +67,7 @@
                     <% if ("PENDING".equals(status)) { %>
                         <form action="<%= request.getContextPath() %>/reception/confirmAppointment" method="post" style="display:inline;">
                             <input type="hidden" name="appointmentId" value="<%= app.getAppointmentId() %>">
-                            <button type="submit" class="btn btn-success btn-sm">Confirm</button>
+<button type="submit" class="btn btn-success btn-sm">Confirm</button>
                         </form>
                         <form action="<%= request.getContextPath() %>/reception/cancelAppointment" method="post" style="display:inline;">
                             <input type="hidden" name="appointmentId" value="<%= app.getAppointmentId() %>">
