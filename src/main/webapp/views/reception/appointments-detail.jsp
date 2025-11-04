@@ -1,4 +1,4 @@
-<%@ page import="com.vaccination.model.Appointment" %>
+<%@ page import="model.Appointment" %>
 <%
     Appointment app = (Appointment) request.getAttribute("appointment");
 %>

@@ -1,5 +1,5 @@
 <%@ page import="java.util.List" %>
-<%@ page import="com.vaccination.model.Appointment" %>
+<%@ page import="model.Appointment" %>
 <%
     List<Appointment> appointments = (List<Appointment>) request.getAttribute("appointments");
 %>
