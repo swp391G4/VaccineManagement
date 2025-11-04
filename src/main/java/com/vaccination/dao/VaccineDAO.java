@@ -3,7 +3,6 @@ package com.vaccination.dao;
 import com.vaccination.model.Vaccine;
 import com.vaccination.util.DatabaseConnection;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,30 +163,6 @@ public class VaccineDAO {
         return false;
     }
 
-    public boolean createVaccine(String name,String manufacturer, BigDecimal price, boolean isFree, String description, boolean isActive, String imageUrl) {
-        String sql =
-                "INSERT INTO Vaccines (VaccineName, Manufacturer, Description, Price, IsFree, IsActive, ImageUrl, CreatedAt) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE())";
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, name);
-            ps.setString(2, manufacturer);
-            ps.setString(3, description);
-            ps.setBigDecimal(4, price != null ? price : BigDecimal.ZERO);
-            ps.setBoolean(5, isFree);
-            ps.setBoolean(6, isActive);
-            ps.setString(7, (imageUrl == null || imageUrl.isBlank()) ? null : imageUrl.trim());
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace(); // TODO: thay bằng logger chung nếu dự án có
-            return false;
-        }
-    }
-
 
     private Vaccine extractVaccineFromResultSet(ResultSet rs) throws SQLException {
         Vaccine vaccine = new Vaccine();
@@ -211,7 +186,7 @@ public class VaccineDAO {
 
         return vaccine;
     }
-
+    
     public boolean deactivateVaccine(int vaccineId) {
         String sql = "UPDATE Vaccines SET IsActive = 0 WHERE VaccineID = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
