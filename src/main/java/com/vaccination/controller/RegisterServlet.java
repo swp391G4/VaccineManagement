@@ -58,7 +58,7 @@ public class RegisterServlet extends HttpServlet {
 
         User newUser = new User();
         newUser.setEmail(email);
-        newUser.setPassword(PasswordUtil.hashPassword(password));
+        newUser.setPassword(password);
         newUser.setFullName(fullName);
         newUser.setPhoneNumber(phoneNumber);
         newUser.setRole("PARENT");
@@ -69,7 +69,7 @@ public class RegisterServlet extends HttpServlet {
             request.getRequestDispatcher("/views/guest/login.jsp").forward(request, response);
         } else {
             request.setAttribute("error", "Registration failed. Please try again.");
-            request.getRequestDispatcher("/views/guest/register.jsp").forward(request, response);
+request.getRequestDispatcher("/views/guest/register.jsp").forward(request, response);
         }
     }
 }

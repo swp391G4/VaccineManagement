@@ -236,7 +236,7 @@ GO
 
 -- Insert Default Admin User
 INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive, ImageUrl)
-VALUES ('admin@vaccination.com', 'Admin@123', 'System Administrator', '0900000000', 'ADMIN', 1, '/images/users/admin.jpg');
+VALUES ('admin@vaccination.com', '$2a$10$q0vay9HWt6j.havDIepdhuCuAo0Gt8A/LNiFd2CZb0V/HHgG.iLOu', 'System Administrator', '0900000000', 'ADMIN', 1, '/images/users/admin.jpg');
 GO
 
 -- Insert Sample Centers
@@ -318,14 +318,14 @@ GO
 -- Insert Sample Users (Unaccented Vietnamese Names)
 PRINT 'Inserting Sample Users...';
 INSERT INTO Users (Email, Password, FullName, PhoneNumber, Role, IsActive, ImageUrl) VALUES
-('parent1@test.com', '123456', 'Nguyen Van An', '0901234567', 'PARENT', 1, '/images/users/parent1.jpg'),
-('parent2@test.com', '123456', 'Tran Thi Binh', '0909876543', 'PARENT', 1, '/images/users/parent2.jpg'),
-('parent3@test.com', '123456', 'Le Hoang Cuong', '0903456789', 'PARENT', 1, '/images/users/parent3.jpg'),
-('reception1@test.com', '123456', 'Pham Minh Duc', '0912345678', 'RECEPTION', 1, '/images/users/reception1.jpg'),
-('reception2@test.com', '123456', 'Vo Thi Em', '0913456789', 'RECEPTION', 1, '/images/users/reception2.jpg'),
-('doctor1@test.com', '123456', 'Bac si Hoang Thi Hoa', '0923456789', 'MEDICAL', 1, '/images/users/doctor1.jpg'),
-('doctor2@test.com', '123456', 'Bac si Dang Van Khoa', '0924567890', 'MEDICAL', 1, '/images/users/doctor2.jpg'),
-('doctor3@test.com', '123456', 'Bac si Tran Ngoc Lan', '0925678901', 'MEDICAL', 1, '/images/users/doctor3.jpg');
+('parent1@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Nguyen Van An', '0901234567', 'PARENT', 1, '/images/users/parent1.jpg'),
+('parent2@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Tran Thi Binh', '0909876543', 'PARENT', 1, '/images/users/parent2.jpg'),
+('parent3@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Le Hoang Cuong', '0903456789', 'PARENT', 1, '/images/users/parent3.jpg'),
+('reception1@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Pham Minh Duc', '0912345678', 'RECEPTION', 1, '/images/users/reception1.jpg'),
+('reception2@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Vo Thi Em', '0913456789', 'RECEPTION', 1, '/images/users/reception2.jpg'),
+('doctor1@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Bac si Hoang Thi Hoa', '0923456789', 'MEDICAL', 1, '/images/users/doctor1.jpg'),
+('doctor2@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Bac si Dang Van Khoa', '0924567890', 'MEDICAL', 1, '/images/users/doctor2.jpg'),
+('doctor3@test.com', '$2a$10$FxMj7TkOMnnBtHsgDatRq.g8GImRkSus/4E5bIRIscx71pf.AM0hG', 'Bac si Tran Ngoc Lan', '0925678901', 'MEDICAL', 1, '/images/users/doctor3.jpg');
 GO
 
 -- Insert Working Schedule
