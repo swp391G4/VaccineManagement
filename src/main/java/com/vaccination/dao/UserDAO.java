@@ -265,8 +265,10 @@ public class UserDAO {
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("UserID"));
-        user.setEmail(rs.getString("Email"));
-        user.setPassword(rs.getString("Password")); // Lấy cả password? Cân nhắc bảo mật
+        String dbEmail = rs.getString("Email");
+        user.setEmail(dbEmail != null ? dbEmail.trim() : null); // Trim to handle NVARCHAR padding
+        String dbPassword = rs.getString("Password");
+        user.setPassword(dbPassword != null ? dbPassword.trim() : null); // Trim password to handle NVARCHAR padding
         user.setFullName(rs.getString("FullName"));
         user.setPhoneNumber(rs.getString("PhoneNumber"));
         user.setRole(rs.getString("Role"));
@@ -287,7 +289,14 @@ public class UserDAO {
             user.setLastLogin(lastLogin.toLocalDateTime());
         }
 
-        user.setImageUrl(rs.getString("ImageUrl")); // <<<===== THÊM DÒNG NÀY
+        // Check if ImageUrl column exists before accessing it
+        try {
+            rs.findColumn("ImageUrl");
+            user.setImageUrl(rs.getString("ImageUrl"));
+        } catch (SQLException e) {
+            // ImageUrl column doesn't exist in this database schema
+            user.setImageUrl(null);
+        }
 
         return user;
     }
