@@ -41,6 +41,7 @@ com\vaccination\reception\AppointmentConfirmServlet.class
 com\vaccination\controller\parent\VaccinationHistoryServlet.class
 com\vaccination\controller\admin\UserEditServlet.class
 com\vaccination\reception\AppointmentsManageServlet.class
+com\vaccination\controller\admin\UserDeleteServlet.class
 com\vaccination\controller\parent\ChildManagementServlet.class
 com\vaccination\controller\parent\AppointmentManagementServlet.class
 com\vaccination\model\Vaccine.class

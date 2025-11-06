@@ -262,6 +262,94 @@ public class UserDAO {
         return false;
     }
 
+    public boolean deleteUser(int userId) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getInstance().getConnection();
+            conn.setAutoCommit(false); // Start transaction
+            
+            // Delete related records first to avoid foreign key constraint violations
+            
+            // 1. Delete notifications for this user
+            try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM Notifications WHERE UserID = ?")) {
+                stmt.setInt(1, userId);
+                stmt.executeUpdate();
+            }
+            
+            // 2. Delete staff assignments
+            try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM StaffAssignments WHERE UserID = ?")) {
+                stmt.setInt(1, userId);
+                stmt.executeUpdate();
+            }
+            
+            // 3. Set ConfirmedBy to NULL in appointments
+            try (PreparedStatement stmt = conn.prepareStatement("UPDATE Appointments SET ConfirmedBy = NULL WHERE ConfirmedBy = ?")) {
+                stmt.setInt(1, userId);
+                stmt.executeUpdate();
+            }
+            
+            // 4. Set AdministeredBy to NULL in vaccination records (if possible) or handle error
+            // Note: AdministeredBy is NOT NULL, so we cannot delete users who have administered vaccinations
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM VaccinationRecords WHERE AdministeredBy = ?")) {
+                stmt.setInt(1, userId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    conn.rollback();
+                    throw new SQLException("Cannot delete user: This user has administered vaccinations");
+                }
+            }
+            
+            // 5. Handle Children table - ParentID has ON DELETE CASCADE, so it will be handled automatically
+            // But we might want to check if this will orphan children
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM Children WHERE ParentID = ?")) {
+                stmt.setInt(1, userId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // Children will be deleted due to CASCADE, but we should inform about this
+                    int childCount = rs.getInt(1);
+                    // Note: In production, use proper logging framework
+                    System.err.println("Warning: Deleting user will also delete " + childCount + " child record(s)");
+                }
+            }
+            
+            // 6. Finally delete the user
+            String sql = "DELETE FROM Users WHERE UserID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, userId);
+                int result = stmt.executeUpdate();
+                
+                if (result > 0) {
+                    conn.commit();
+                    return true;
+                } else {
+                    conn.rollback();
+                    return false;
+                }
+            }
+            
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    // Log rollback failure
+                    System.err.println("Failed to rollback transaction: " + ex.getMessage());
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    // Log connection cleanup failure
+                    System.err.println("Failed to close connection: " + e.getMessage());
+                }
+            }
+        }
+    }
+
     private User extractUserFromResultSet(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("UserID"));

@@ -49,5 +49,6 @@ C:\Users\Hai\Documents\VaccineManagement\src\main\java\com\vaccination\dao\Vacci
 C:\Users\Hai\Documents\VaccineManagement\src\main\java\com\vaccination\reception\AppointmentConfirmServlet.java
 C:\Users\Hai\Documents\VaccineManagement\src\main\java\com\vaccination\controller\parent\ParentDashboardServlet.java
 C:\Users\Hai\Documents\VaccineManagement\src\main\java\com\vaccination\controller\medical\ConfirmedAppointmentManagementServlet.java
+C:\Users\Hai\Documents\VaccineManagement\src\main\java\com\vaccination\controller\admin\UserDeleteServlet.java
 C:\Users\Hai\Documents\VaccineManagement\src\main\java\com\vaccination\dao\DashboardDAO.java
 C:\Users\Hai\Documents\VaccineManagement\src\main\java\com\vaccination\controller\parent\AppointmentManagementServlet.java
